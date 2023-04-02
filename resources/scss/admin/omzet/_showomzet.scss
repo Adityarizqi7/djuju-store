@@ -1,0 +1,19 @@
+@import '../../base.scss';
+
+.show-omzet-component {
+    #container_show_omzet {
+        padding: 0 1rem;
+
+        #form_omzet {
+            .form-control {
+                #month {
+                    &::-webkit-calendar-picker-indicator {
+                        cursor: pointer;
+                        border-radius: 5px;
+                        background-color: white;
+                    }
+                }
+            }
+        }
+    }
+}

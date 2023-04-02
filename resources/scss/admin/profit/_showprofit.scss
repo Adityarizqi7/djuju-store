@@ -1,0 +1,19 @@
+@import '../../base.scss';
+
+.show-profit-component {
+    #container_show_profit {
+        padding: 0 1rem;
+
+        #form_profit {
+            .form-control {
+                #month {
+                    &::-webkit-calendar-picker-indicator {
+                        cursor: pointer;
+                        border-radius: 5px;
+                        background-color: white;
+                    }
+                }
+            }
+        }
+    }
+}

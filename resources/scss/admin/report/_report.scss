@@ -1,0 +1,86 @@
+@import '../../base.scss';
+
+.report-component {
+    #container_report {
+        padding: 0 1rem 3rem 1rem;
+
+        .statistic-search-section {
+            .search-note {
+                .box-search {
+                    z-index: 1;
+                    position: relative;
+                    > input {
+                        width: 100%;
+                        border-top: 0;
+                        border-left: 0;
+                        height: 3.5rem;
+                        border-right: 0;
+                        border-bottom: 1px solid rgb(235, 235, 235);
+                        @include text-head(#000000, 1rem, 400);
+    
+                        &::placeholder {
+                            @include text-head(rgb(185, 185, 185), 1rem, 400);
+                        }
+                        &:focus {
+                            outline: none;
+                            border-bottom-color: rgb(72, 96, 228);
+                        }
+                        &:focus-visible {
+                            & + h1 {
+                                display: none;
+                            }
+                        }
+                    }
+                    > svg {
+                        @include transition(transform, 0.3s);
+                    }
+                }
+                > button {
+                    color: white;
+                    border-radius: 15px;
+                    padding: 1rem 1.75rem;
+                    @include transition(background-color, 0.2s);
+                }
+            }
+        }
+        .date-download-section {
+            #date {
+                &::-webkit-calendar-picker-indicator {
+                    cursor: pointer;
+                    border-radius: 5px;
+                    background-color: white;
+                }
+            }
+        }
+        .all-note-table {
+            &::-webkit-scrollbar {
+                @media only screen and (max-width: 767px) {
+                    display: none;
+                }
+                width: 10px;
+                background-color: transparent;
+            }
+            &::-webkit-scrollbar-track {
+                background-color: transparent;
+            }
+            &::-webkit-scrollbar-thumb {
+                background-color: #002fff7a;
+            }
+
+            table {
+                thead {
+                    .column-name {
+                        z-index: 1;
+                        position: sticky;
+                        top: 0;
+                    }
+                }
+            }
+        }
+        ul {
+            li:not(:last-child) {
+                border-bottom: 1px solid rgba(194, 194, 194, 0.425);
+            }
+        }
+    }
+}

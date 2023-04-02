@@ -1,0 +1,19 @@
+@import '../../base.scss';
+
+.show-asset-component {
+    #container_show_asset {
+        padding: 0 1rem;
+
+        #form_asset {
+            .form-control {
+                #month {
+                    &::-webkit-calendar-picker-indicator {
+                        cursor: pointer;
+                        border-radius: 5px;
+                        background-color: white;
+                    }
+                }
+            }
+        }
+    }
+}

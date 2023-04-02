@@ -1,0 +1,23 @@
+@import '../base.scss';
+
+.dashboard-component {
+    #container_dashboard {
+        .content-wrapper {
+            display: flex;
+            .navout-up-dash {
+                @media only screen and (max-width: 320px) {
+                    gap: 1rem;
+                    flex-direction: column;
+                    justify-content: center;
+                }
+            }
+            .right-content {
+                .nav-up-dash {
+                    @media only screen and (max-width: 375px) {
+                        display: none;
+                    }
+                }
+            }
+        }
+    }
+}

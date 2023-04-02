@@ -1,0 +1,47 @@
+@import '../../base.scss';
+
+.report-range-component {
+    #container_report_range {
+        padding: 0 1rem 3rem 1rem;
+
+        .date-download-section {
+            #date {
+                &::-webkit-calendar-picker-indicator {
+                    cursor: pointer;
+                    border-radius: 5px;
+                    background-color: white;
+                }
+            }
+        }
+        .all-note-table {
+            &::-webkit-scrollbar {
+                @media only screen and (max-width: 767px) {
+                    display: none;
+                }
+                width: 10px;
+                background-color: transparent;
+            }
+            &::-webkit-scrollbar-track {
+                background-color: transparent;
+            }
+            &::-webkit-scrollbar-thumb {
+                background-color: #002fff7a;
+            }
+
+            table {
+                thead {
+                    .column-name {
+                        z-index: 1;
+                        position: sticky;
+                        top: 0;
+                    }
+                }
+            }
+        }
+        ul {
+            li:not(:last-child) {
+                border-bottom: 1px solid rgba(194, 194, 194, 0.425);
+            }
+        }
+    }
+}
