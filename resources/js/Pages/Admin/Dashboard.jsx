@@ -1,4 +1,5 @@
 import React from "react";
+import { usePage } from "@inertiajs/react";
 import moment from "moment";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { BadgeDelta, Card, Grid, Flex, Metric, ProgressBar, Text, Col, Title, Icon, AreaChart, ListItem, List, } from "@tremor/react";
@@ -9,14 +10,13 @@ import AdminLayout from "@/Layouts/AdminLayout";
 import { formatedCurrency } from "@/Utils/String";
 import DashboardLayout from '@/Pages/Admin/DashboardLayout';
 import { dateYMD, dayYesterdayYMD, monthYesterdayYMD, monthYM } from "@/Utils/Date";
-import { usePage } from "@inertiajs/react";
 
 export default function Dashboard({notes, omzet, modal}) {
 
     const { auth } = usePage().props
 
     /* Omzet Bulanan */
-    const targetOmzetMonth = 500000
+    const targetOmzetMonth = 4000000
     const omzetMonthTotal = notes?.filter(e => e?.created_transaction_at?.slice(0, 7) === monthYM())?.reduce((accumulator, currentValue) => {
         return accumulator + currentValue.cost_subtotal;
     }, 0);
@@ -27,7 +27,7 @@ export default function Dashboard({notes, omzet, modal}) {
     const omzetMonthPercentage =  omzetMonthYesterdayTotal !== 0 ? (((omzetMonthTotal - omzetMonthYesterdayTotal) / omzetMonthYesterdayTotal) * 100)?.toFixed(1) : 0
     
     /* Omzet Harian */
-    const targetOmzetToday = 25000
+    const targetOmzetToday = 200000
     const omzetTodayTotal = notes?.filter(e => e?.created_transaction_at?.split(' ')[0] === dateYMD())?.reduce((accumulator, currentValue) => {
         return accumulator + currentValue.cost_subtotal;
     }, 0);
@@ -66,7 +66,7 @@ export default function Dashboard({notes, omzet, modal}) {
                             <BadgeDelta deltaType={omzetMonthTotal >= omzetMonthYesterdayTotal ? 'increase' : 'decrease'}>{`${omzetMonthPercentage}%`}</BadgeDelta>
                         </Flex>
                         <Flex className="mt-4 space-x-2">
-                            <Text className="truncate">{`${(omzetMonthTotal/targetOmzetMonth)*100}% (${omzetMonthTotal})`}</Text>
+                            <Text className="truncate">{`${((omzetMonthTotal/targetOmzetMonth)*100)?.toFixed(2)}% (${omzetMonthTotal})`}</Text>
                             <Text>{formatedCurrency(targetOmzetMonth)}</Text>
                         </Flex>
                         <ProgressBar percentageValue={(omzetMonthTotal/targetOmzetMonth)*100} className="mt-2" />
@@ -81,7 +81,7 @@ export default function Dashboard({notes, omzet, modal}) {
                             <BadgeDelta deltaType={omzetTodayTotal >= omzetYesterdayTotal ? 'increase' : 'decrease'}>{`${omzetTodayPercentage}%`}</BadgeDelta>
                         </Flex>
                         <Flex className="mt-4 space-x-2">
-                            <Text className="truncate">{`${(omzetTodayTotal/targetOmzetToday)*100}% (${omzetTodayTotal})`}</Text>
+                            <Text className="truncate">{`${((omzetTodayTotal/targetOmzetToday)*100)?.toFixed(2)}% (${omzetTodayTotal})`}</Text>
                             <Text>{formatedCurrency(targetOmzetToday)}</Text>
                         </Flex>
                         <ProgressBar percentageValue={(omzetTodayTotal/targetOmzetToday)*100} className="mt-2" />
@@ -96,7 +96,7 @@ export default function Dashboard({notes, omzet, modal}) {
                             <BadgeDelta deltaType={noteMonthLengthTotal >= noteMonthYesterdayLengthTotal ? 'increase' : 'decrease'}>{`${noteMonthLengthPercentage}%`}</BadgeDelta>
                         </Flex>
                         <Flex className="mt-4 space-x-2">
-                            <Text className="truncate">{`${(noteMonthLengthTotal/targetNoteMonthLength)*100}% (${Number(noteMonthLengthTotal).toLocaleString('en')})`}</Text>
+                            <Text className="truncate">{`${((noteMonthLengthTotal/targetNoteMonthLength)*100)?.toFixed(2)}% (${Number(noteMonthLengthTotal).toLocaleString('en')})`}</Text>
                             <Text>{Number(targetNoteMonthLength).toLocaleString('en')}</Text>
                         </Flex>
                         <ProgressBar percentageValue={(noteMonthLengthTotal/targetNoteMonthLength)*100} className="mt-2" />
@@ -131,7 +131,7 @@ export default function Dashboard({notes, omzet, modal}) {
                                     }))
                                 }
                                 index="month"
-                                yAxisWidth={73}
+                                yAxisWidth={82}
                                 colors={["blue"]}
                                 showLegend={false}
                                 categories={["value"]}
@@ -217,9 +217,9 @@ export default function Dashboard({notes, omzet, modal}) {
                         </div>
                         {
                             auth?.user?.role === 'owner' &&
-                            <div className='mt-5'>
+                            <div className='mt-5 border-t border-gray-300 pt-4'>
                                 <Title className='poppins font-semibold'>Profit Bulan ini</Title>
-                                <Metric className="truncate poppins mt-3 underline">{formatedCurrency(modalThisMonth)}</Metric>
+                                <Metric className="truncate poppins mt-3">{formatedCurrency(modalThisMonth)}</Metric>
                             </div>
                         }
                     </Card>

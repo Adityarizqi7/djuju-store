@@ -4,6 +4,15 @@
     #container_note {
         padding: 0 1rem 3rem 1rem;
 
+        .form-control-transaction {
+            #created_transaction_at {
+                &::-webkit-calendar-picker-indicator {
+                    cursor: pointer;
+                    border-radius: 5px;
+                    background-color: white;
+                }
+            }
+        }
         .all-note-table {
             &::-webkit-scrollbar {
                 @media only screen and (max-width: 767px) {

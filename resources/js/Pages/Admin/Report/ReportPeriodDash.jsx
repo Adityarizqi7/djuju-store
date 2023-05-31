@@ -52,6 +52,6 @@ export default function ReportPeriodDash() {
 
 ReportPeriodDash.layout = page => (
     <AdminLayout title='Periode Laporan - Admin Toko Sembako Djuju' keyword='periode laporan dashboard toko sembako djuju' desc='Halaman untuk memilih periode laporan pada toko sembako Djuju' >
-        <DashboardLayout children={page} pageName="Peirode Laporan" />
+        <DashboardLayout children={page} pageName="Peirode Laporan Penjualan" />
     </AdminLayout>
 )

@@ -21,7 +21,8 @@ export default function ReportWeek({notes}) {
     const downloadButtonRef = useRef(null);
     
     const [isOpen, setIsOpen] = useState(false)
-    const [date, setDate] = useState(weekYW());
+    const [date, setDate] = useState('2022-W01');
+    // const [date, setDate] = useState(weekYW());
     const [searchNote, setSearchNote] = useState('')
     const [dialogDownloadFile, setDialogDownloadFile] = useState(false)
 
@@ -52,21 +53,34 @@ export default function ReportWeek({notes}) {
     }
 
     const toPdf = () => {
+
         const doc = new jsPDF()
+
+        const columnStyles = {
+            2: { cellWidth: 20 }, 
+            4: { cellWidth: 22 }, 
+            5: { cellWidth: 22 }, 
+            6: { cellWidth: 15 }, 
+            7: { cellWidth: 22 }, 
+            8: { cellWidth: 22 }, 
+        };
 
         doc.setFontSize(18)
         var pageSize = doc.internal.pageSize
         var pageWidth = pageSize.width ? pageSize.width : pageSize.getWidth()
         var text = doc.splitTextToSize(`Laporan Catatan Penjualan Pada Toko Sembako Djuju - ${convertWeekReadble(date)}`, pageWidth - 30, {})
+        var textTwo = doc.splitTextToSize(`Total Omzet: ${costTotal}`, pageWidth - 30, {})
         doc.setLineHeightFactor(1.5)
         doc.text(text, 14, 18)
+        doc.text(textTwo, 14, 40)
 
         autoTable(doc, {
             theme: 'grid',
-            startY: 38,
+            startY: 50,
             head: [
                 [
                     { content: 'Nomor', styles: { fontWeight: 'bold' } },
+                    { content: 'Tanggal Transaksi', styles: { fontWeight: 'bold' } },
                     { content: 'Kode Transaksi', styles: { fontWeight: 'bold' } },
                     { content: 'Nama Barang', styles: { fontWeight: 'bold' } },
                     { content: 'Harga Jual', styles: { fontWeight: 'bold' } },
@@ -84,6 +98,7 @@ export default function ReportWeek({notes}) {
                 })
                 ?.map((note, id) => [
                     id + 1,
+                    note?.created_transaction_at,
                     note?.transaction_order,
                     note?.product.name,
                     formatedCurrency(note?.product.sell_price),
@@ -93,6 +108,7 @@ export default function ReportWeek({notes}) {
                     formatedCurrency(note?.cost_total)
                 ])
             ,
+            columnStyles,
             didParseCell: function (data) {
                 data.cell.styles.halign = 'center';
                 data.cell.styles.valign = 'middle';
@@ -101,6 +117,19 @@ export default function ReportWeek({notes}) {
 
         return doc.save(`Laporan Penjualan - ${convertWeekReadble(date)}`)
     }
+
+    const totalTransactions = notes
+    ?.filter(note => {
+        const createdDate = moment(note.created_transaction_at.slice(0, 10), 'YYYY-MM-DD');
+        return createdDate >= moment(startDateFormatted, 'YYYY-MM-DD') && createdDate <= moment(endDateFormatted, 'YYYY-MM-DD');
+    })
+    .reduce((count, note) => {
+        if (!count.codeRecords.includes(note.transaction_order)) {
+        count.codeRecords.push(note.transaction_order);
+        count.totalTransactions++;
+        }
+        return count;
+    }, { codeRecords: [], totalTransactions: 0 }).totalTransactions;
 
     useEffect(() => {
 
@@ -181,9 +210,13 @@ export default function ReportWeek({notes}) {
                                         >
                                             Statistik Penjualan {convertWeekReadble(date)}
                                         </Dialog.Title>
-                                        <div className="mt-3 border-b border-gray-400/40 pb-2">
-                                            <h1>Total Omset: <strong> {
+                                        <div className="mt-3 space-y-2 border-b border-gray-400/40 pb-2">
+                                            <h1>Total Omzet: <strong> {
                                                 costTotal
+                                            }</strong>
+                                            </h1>
+                                            <h1>Total Transaksi: <strong> {
+                                                totalTransactions
                                             }</strong>
                                             </h1>
                                         </div>
@@ -282,7 +315,7 @@ export default function ReportWeek({notes}) {
                                     id="convert-xls-button"
                                     className="download-table-xls-button"
                                     table="table-data"
-                                    filename={`Laporan Catatan Penjualan Pada Toko Sembako Djuju - ${convertWeekReadble(date)}`}
+                                    filename={`Laporan Penjualan Pada Toko Sembako Djuju - ${convertWeekReadble(date)}`}
                                     filetype="xls"
                                     sheet="tablexls"
                                     buttonText="Excel"
@@ -411,6 +444,6 @@ export default function ReportWeek({notes}) {
 
 ReportWeek.layout = page => (
     <AdminLayout title='Laporan Mingguan - Admin Toko Sembako Djuju' keyword='laporan mingguan catatan penjualan barang dagangan toko sembako djuju' desc='Halaman untuk megelola laporan mingguan dagangan yang ada pada Toko Sembako Djuju' >
-        <DashboardLayout children={page} pageName="Laporan Harian" />
+        <DashboardLayout children={page} pageName="Laporan Penjualan Mingguan" />
     </AdminLayout>
 )

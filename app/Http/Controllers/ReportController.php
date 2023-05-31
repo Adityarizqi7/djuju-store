@@ -33,7 +33,7 @@ class ReportController extends Controller {
     public function week_period() {
         $notes = Note::with('product')
             ->where('is_finished', 'Y')
-            ->orderBy('id', 'asc')
+            ->orderBy('created_transaction_at', 'asc')
             ->get();
 
         return Inertia::render('Admin/Report/ReportWeek', [
@@ -44,7 +44,7 @@ class ReportController extends Controller {
     public function month_period() {
         $notes = Note::with('product')
             ->where('is_finished', 'Y')
-            ->orderBy('id', 'asc')
+            ->orderBy('created_transaction_at', 'asc')
             ->get();
         $modal = Asset::all();
 
@@ -57,7 +57,7 @@ class ReportController extends Controller {
     public function year_period() {
         $notes = Note::with('product')
             ->where('is_finished', 'Y')
-            ->orderBy('id', 'asc')
+            ->orderBy('created_transaction_at', 'asc')
             ->get();
 
         return Inertia::render('Admin/Report/ReportYear', [
@@ -68,7 +68,7 @@ class ReportController extends Controller {
     public function range_period() {
         $notes = Note::with('product')
             ->where('is_finished', 'Y')
-            ->orderBy('id', 'asc')
+            ->orderBy('created_transaction_at', 'asc')
             ->get();
 
         return Inertia::render('Admin/Report/ReportRangeDate', [

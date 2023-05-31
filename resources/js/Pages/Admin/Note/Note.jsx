@@ -7,7 +7,7 @@ import { Popover, Transition, Dialog } from "@headlessui/react";
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { List, ListItem, SelectBox, SelectBoxItem } from "@tremor/react";
-import { DocumentArrowUpIcon, PencilIcon, QrCodeIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { ArrowPathIcon, DocumentArrowUpIcon, PencilIcon, QrCodeIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
 
 import '../../../../scss/admin/note/_note.scss';
 
@@ -15,7 +15,7 @@ import AdminLayout from "@/Layouts/AdminLayout";
 import DashboardLayout from '../DashboardLayout';
 import InputError from "@/Components/InputError";
 import { Spin } from "@/Components/loading/Spin";
-import { CurrentYear, now, dateNow } from '@/Utils/Date';
+import { CurrentYear, now, dateNow, dateYMD } from '@/Utils/Date';
 import SuccessAlert from "@/Components/alert/SuccessAlert";
 import { formatedCurrency, limitString, randomStringCustom } from "@/Utils/String";
 
@@ -42,6 +42,7 @@ export default function Note({products, notes}) {
     const [successCreate, setSuccessCreate] = useState(false)
     const [successDelete, setSuccessDelete] = useState(false)
     const [successTransaction, setSuccessTransaction] = useState(false)
+    const [successReturnedSaved, setSuccessReturnedSaved] = useState(false)
     
     const [valueEditNote, setValueEditNote] = useState({
         purchase_amount: ''
@@ -60,6 +61,7 @@ export default function Note({products, notes}) {
     }
     
     const [valueTransaction, setValueTransaction] = useState({
+        created_transaction_at: dateYMD(),
         transaction_order: CurrentYear().toString().substring(2, 4)+(dateNow().getMonth() + 1)+dateNow().getDate()+randomStringCustom(9),
     })
     
@@ -122,6 +124,13 @@ export default function Note({products, notes}) {
         );
     };
 
+    const handleOnChangeTransaction = (e) => {
+        setValueTransaction({
+            ...valueTransaction,
+            [e.target.name]: e.target.value}
+        );
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         post(route('note.store'), {
@@ -140,6 +149,7 @@ export default function Note({products, notes}) {
         router.put(`/note/finish`, valueTransaction ,{
             onSuccess() {
                 setValueTransaction({
+                    created_transaction_at: dateYMD(),
                     transaction_order: CurrentYear().toString().substring(2, 4)+(dateNow().getMonth() + 1)+dateNow().getDate()+randomStringCustom(9),
                 })
                 setSuccessTransaction(true)
@@ -183,6 +193,19 @@ export default function Note({products, notes}) {
         })
     }
 
+    const returned_saved = (e, id) => {
+        e.preventDefault()
+        router.put(`/note/${id}/returned_saved`, valueCostSubtotal ,{
+            preserveScroll: true,
+            onSuccess() {
+                setSuccessReturnedSaved(true)
+            },
+            onStart() {
+                setSuccessReturnedSaved(false)
+            }
+        })
+    }
+
     useEffect(() => {
 
         document.addEventListener('keydown', handleFocusInput)
@@ -196,10 +219,10 @@ export default function Note({products, notes}) {
         <div className="note-component">
             <div id="container_note">
             {
-                products?.find(e => e?.stock < 1) &&
+                products && products.some((product) => String(product.id) === data?.product_id && product.stock < data?.purchase_amount) &&
                 <div className="mt-8 alert flex items-center 3xs:block bg-red-500 montserrat py-3 px-3 rounded-[10px] gap-2 text-white">
                     <BellAlertIcon className='w-6 h-6' />
-                    <h1> Terdapat stok barang yang kosong, <u onClick={openModal} className='cursor-pointer'>Cek disini</u></h1>
+                    <h1> Stok barang tidak mencukupi, <u onClick={openModal} className='cursor-pointer'>Cek disini</u></h1>
                 </div>
             }
                 <Transition appear show={isOpen} as={Fragment}>
@@ -236,12 +259,11 @@ export default function Note({products, notes}) {
                                         </Dialog.Title>
                                         <List className="mt-3 space-y-2">
                                         {
-                                            products
-                                            ?.filter(e => e?.stock < 1)
-                                            .map((e, id) => (
+                                            products && products.filter((product) => String(product.id) === data?.product_id && product.stock < data?.purchase_amount)
+                                            ?.map((e, id) => (
                                                 <ListItem key={id} className='border-b border-gray-200'>
                                                     <h2 className='text-[1.05rem]'>
-                                                        <strong>{`${id + 1}.`}</strong>{` ${e?.name}, `}
+                                                        <strong>{`${id + 1}.`}</strong>{` ${e?.name} - Kekurangan ${data?.purchase_amount - e?.stock} stok untuk Pembelian ${data?.purchase_amount}. Tersisa ${e?.stock} stok. `}
                                                         <Link href={route('product.edit', e?.id)}>
                                                             <u className='cursor-pointer text-blue-600 focus:border-0' autoFocus={false}>Lihat disini</u>
                                                         </Link>
@@ -297,6 +319,10 @@ export default function Note({products, notes}) {
                 {
                     successSaved === true &&
                     <SuccessAlert msg_primary={'Berhasil diarsipkan! '} msg_detail={`Pencatatan barang berhasil disimpan dan diarsipkan.`} className={'mt-8 fixed z-[7] right-4 top-0 xxs:left-4'} />
+                }
+                {
+                    successReturnedSaved === true &&
+                    <SuccessAlert msg_primary={'Berhasil dikembalikan! '} msg_detail={`Pencatatan barang ditunda dan dikembalikan.`} className={'mt-8 fixed z-[7] right-4 top-0 xxs:left-4'} />
                 }
                 {
                     successTransaction === true &&
@@ -371,13 +397,16 @@ export default function Note({products, notes}) {
                             </Tooltip>
                         </div>
                         <div className="form-control flex-1">
-                            <input type="number" name='purchase_amount' id="purchase_amount" ref={inputProduct} onChange={handleOnChange} value={
+                            <input type="number" name='purchase_amount' id="purchase_amount" onChange={handleOnChange} value={
                                 data?.purchase_amount
-                            } className='rounded-[5px] montserrat w-full' placeholder='Jumlah pembelian' />
+                            } className='rounded-[5px] montserrat w-full ' placeholder='Jumlah pembelian' />
                             <InputError message={errors.hasOwnProperty('purchase_amount') === true && errors?.purchase_amount} className={`${errors?.purchase_amount && 'block'} mt-2 w-full`} />
                         </div>
                     </div>
-                    <button className={` ${valuesEmpty() && 'opacity-20 pointer-events-none'} ${processing && ' pointer-events-none'} focus:outline-none bg-blue-200 hover:bg-blue-500 text-blue-800 hover:text-white transition-colors duration-200 montserrat px-3 py-2 rounded-[5px] w-full`} ref={inputSubmitNote} disabled={processing}>
+                    {
+                        
+                    }
+                    <button className={` ${valuesEmpty() && 'opacity-20 pointer-events-none' || products && products.some((product) => String(product.id) === data?.product_id && product.stock < data?.purchase_amount) && 'opacity-20 pointer-events-none'} ${processing && ' pointer-events-none'} focus:outline-none bg-blue-200 hover:bg-blue-500 text-blue-800 hover:text-white transition-colors duration-200 montserrat px-3 py-2 rounded-[5px] w-full`} ref={inputSubmitNote} disabled={processing}>
                         {
                             processing ? <Spin /> :  'Catat Barang'
                         }
@@ -435,11 +464,26 @@ export default function Note({products, notes}) {
                         </div>
                     }
                 </div>
+                {
+                    notes?.length > 0 &&
+                    <div className="form-control-transaction flex-1 mt-7">
+                        {
+                            notes?.filter(e => e?.is_saved === 'N')?.length > 0 &&
+                            <h1 className='mb-4 montserrat text-[1.05rem] font-medium'>
+                                Tanggal Transaksi bisa diinput ketika <i>status</i> semua barang telah <span className='text-green-600'>'Saved'</span>!
+                            </h1>
+                        }
+                        <input type="date" name='created_transaction_at' id="created_transaction_at" onChange={handleOnChangeTransaction} value={
+                            valueTransaction?.created_transaction_at
+                        } className={`${notes?.map(e => e?.is_saved === 'N' && ' pointer-events-none opacity-50 ')} cursor-pointer rounded-[5px] montserrat w-full bg-blue-700 border-0 text-white`} placeholder='Jumlah pembelian' />
+                        <InputError message={errors.hasOwnProperty('created_transaction_at') === true && errors?.created_transaction_at} className={`${errors?.created_transaction_at && 'block'} mt-2 w-full`} />
+                    </div>
+                }
                 <div className="all-note-table mt-10 overflow-x-auto h-[37rem] overflow-y-auto">
                     <table className="w-full text-[1.05rem] text-center text-neutral-800">
                         <thead className="text-white uppercase poppins">
                             <tr className="bg-transparent border-x border-t border-b-0 border-orange-600">
-                                <th scope="col" colSpan={8} className="px-6 py-6 text-neutral-900 text-[1.25rem]">
+                                <th scope="col" colSpan={9} className="px-6 py-6 text-neutral-900 text-[1.25rem]">
                                     Catatan Penjualan
                                 </th>
                             </tr>
@@ -523,9 +567,12 @@ export default function Note({products, notes}) {
                                                             progressEdit === true ? <Spin /> : ele?.purchase_amount
                                                         }
                                                         </h1>
-                                                        <Popover.Button>
-                                                            <PencilIcon className="w-4 text-gray-600" />
-                                                        </Popover.Button>
+                                                        {
+                                                            ele?.is_saved === 'N' && 
+                                                            <Popover.Button>
+                                                                <PencilIcon className="w-4 text-gray-600" />
+                                                            </Popover.Button>
+                                                        }
                                                     </>
                                                 }
                                                     <Transition
@@ -574,6 +621,12 @@ export default function Note({products, notes}) {
                                                 ele?.is_saved === 'N' && 
                                                 <button onClick={(e) => is_saved(e, ele?.id)}>
                                                     <DocumentArrowUpIcon className="w-5 h-5 text-blue-500" />
+                                                </button>
+                                            }
+                                            {
+                                                ele?.is_saved === 'Y' && 
+                                                <button onClick={(e) => returned_saved(e, ele?.id)}>
+                                                    <ArrowPathIcon className="w-5 h-5 text-blue-500" />
                                                 </button>
                                             }
                                                 <button onClick={(e) => deleteProduct(e, ele?.id)}>

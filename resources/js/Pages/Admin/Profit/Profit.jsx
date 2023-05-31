@@ -12,7 +12,7 @@ import SuccessAlert from "@/Components/alert/SuccessAlert";
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { now, monthYM, convertMonthReadble, yearY, oneMonthBefore } from '@/Utils/Date';
 
-export default function Profit({profit, totalProfit_lastMonth}) {
+export default function Profit({modal, omzet, totalProfit_lastMonth}) {
 
     const inputRef = useRef()
     const formNoteRef = useRef()
@@ -84,6 +84,50 @@ export default function Profit({profit, totalProfit_lastMonth}) {
         })
     };
 
+    const omzetFiltered = omzet
+    ?.filter((value) => {
+        if (year) {
+        if (value?.omzet_time?.slice(0, 4) === year) return true;
+        return false;
+        }
+        return true;
+    });
+
+    const totalProfitByAssetTime = modal.reduce((accumulator, currentValue) => {
+        const assetTime = currentValue?.asset_time;
+        if (omzetFiltered?.some((omz) => omz.omzet_time === assetTime)) {
+          accumulator[assetTime] = (accumulator[assetTime] || 0) + currentValue.cost_total;
+        }
+        return accumulator;
+    }, {});
+    
+    const totalModal = modal
+    ?.filter((value) => {
+        if (year) {
+            if (value?.asset_time?.slice(0, 4) === year) return true;
+            return false;
+        }
+        return true;
+    })
+    ?.filter((value) => {
+        // filter modal berdasarkan asset_time yang sama dengan omzet
+        return omzet?.some((omz) => omz.omzet_time === value.asset_time);
+    })
+    ?.reduce((total, value) => {
+        return total + value.cost_total;
+    }, 0)
+
+    const totalOmzet = omzet
+    ?.filter((value) => {
+        if (year) {
+            return value?.omzet_time?.slice(0, 4) === year;
+        }
+        return true;
+    })
+    ?.reduce((total, value) => {
+        return total + value?.omzet_amount;
+    }, 0)
+
     useEffect(() => {
 
         document.addEventListener('keydown', handleFocusInput)
@@ -122,14 +166,13 @@ export default function Profit({profit, totalProfit_lastMonth}) {
                     successCreate === true &&
                     <SuccessAlert msg_primary={'Berhasil dicatat! '} msg_detail={` Profit telah dicatat.`} className={'mt-8'} />
                 }
-                <div className="mt-6 alert flex items-center 3xs:block bg-blue-500 montserrat py-3 px-3 rounded-[10px] gap-2 text-white">
+                {/* <div className="mt-6 alert flex items-center 3xs:block bg-blue-500 montserrat py-3 px-3 rounded-[10px] gap-2 text-white">
                     <i className="las la-exclamation-circle text-[1.5rem]"></i>
                     <h1>Profit bulan ini dapat diunggah ketika bulan <u>{convertMonthReadble(monthYM())}</u> selesai. Lihat Statistik Profit <Link href={route('report.period.month')} className='underline'>disini</Link></h1>
                 </div>
-                {
+                
                     formShow &&
                     <form onSubmit={handleSubmitCurrentMonth} action='post' ref={formNoteRef} id='form_note' name="form_note" className="mt-6 space-y-6 shadow-md px-4 py-8 rounded-[5px]">
-                        {/* Form Current Month */}
                         <div className="readble-profit_amount montserrat font-semibold">
                             {
                                 data?.profit_amount === '' ?
@@ -165,8 +208,8 @@ export default function Profit({profit, totalProfit_lastMonth}) {
                                 processing ? <Spin /> :  'Simpan Profit'
                             }
                         </button>
-                    </form>
-                }
+                    </form> */}
+                
                 <div className="form-control mt-10 flex xxs:flex-col items-center justify-between gap-5">
                     <Link
                         href={route('profit.predict')}
@@ -180,7 +223,7 @@ export default function Profit({profit, totalProfit_lastMonth}) {
                     <table className="w-full text-[1.05rem] text-center text-neutral-800">
                         <thead className="text-white uppercase poppins">
                             <tr className="bg-transparent border-x border-t border-b-0 border-orange-600">
-                                <th scope="col" colSpan={4} className="px-6 py-6 text-neutral-900 text-[1.25rem]">
+                                <th scope="col" colSpan={5} className="px-6 py-6 text-neutral-900 text-[1.25rem]">
                                     Profit Bulanan Pada Tahun {year}
                                 </th>
                             </tr>
@@ -192,16 +235,22 @@ export default function Profit({profit, totalProfit_lastMonth}) {
                                     Bulan
                                 </th>
                                 <th scope="col" className="px-6 py-3">
-                                    Jumlah Profit
+                                    Nominal Omzet
                                 </th>
                                 <th scope="col" className="px-6 py-3">
-                                    Aksi
+                                    Nominal Modal
                                 </th>
+                                <th scope="col" className="px-6 py-3">
+                                    Nominal Profit
+                                </th>
+                                {/* <th scope="col" className="px-6 py-3">
+                                    Aksi
+                                </th> */}
                             </tr>
                         </thead>
                         <tbody className="montserrat">
                         {
-                            profit?.length < 1 ?
+                            omzet?.length < 1 ?
                             (
                                 <tr className="bg-white border-b">
                                     <td colSpan={4} className="px-6 py-6 text-[1.25rem] text-center">
@@ -210,36 +259,50 @@ export default function Profit({profit, totalProfit_lastMonth}) {
                                 </tr>
                             )  
                             : 
-                            profit
+                            omzet
                             ?.filter((value) => {
                                 if (year) {
-                                    if (value?.profit_time?.slice(0, 4) === year) return true;
+                                    if (value?.omzet_time?.slice(0, 4) === year) return true;
                                     return false;
                                 }
                                 return true;
                             })
                             ?.map((ele, i) => {
+                                const modalItem = totalProfitByAssetTime[ele.omzet_time] || 0;
+                                const totalProfit = modal
+                                    ?.filter((value) => value?.asset_time === ele?.omzet_time)
+                                    ?.reduce((accumulator, currentValue) => accumulator + (currentValue?.cost_total || 0), 0);
                                 return (
                                     <tr key={i + 1} className="bg-white border-b even:bg-slate-50">
                                         <td data-column='Nomor' className="px-3 py-4">
                                             {i + 1}
                                         </td>
                                         <td data-column='Bulan Profit' className="px-3 py-4">
-                                            {convertMonthReadble(ele?.profit_time)}
+                                            {convertMonthReadble(ele?.omzet_time)}
                                         </td>
                                         <td data-column='Nominal Omset' className="px-3 py-4">
                                         {
-                                            formatedCurrency(ele?.profit_amount)
+                                            formatedCurrency(ele?.omzet_amount)
                                         }
                                         </td>
-                                        <td data-column='Aksi' className="px-6 py-4 flex justify-center items-center space-x-2">
+                                        <td data-column='Nominal Modal' className="px-3 py-4">
+                                        {
+                                            formatedCurrency(modalItem)
+                                        }
+                                        </td>
+                                        <td data-column='Nominal Profit' className="px-3 py-4">
+                                        {
+                                            formatedCurrency(ele?.omzet_amount - totalProfit)
+                                        }
+                                        </td>
+                                        {/* <td data-column='Aksi' className="px-6 py-4 flex justify-center items-center space-x-2">
                                             <Link href={route('profit.edit', ele?.id)}>
                                                 <PencilSquareIcon className="w-6 h-6 text-blue-600" />
                                             </Link>
                                             <button onClick={(el) => deleteProfit(el, ele?.id)}>
                                                 <TrashIcon className="w-5 h-5 text-red-500" />
                                             </button>
-                                        </td>
+                                        </td> */}
                                     </tr>
                                 )
                             })
@@ -251,13 +314,7 @@ export default function Profit({profit, totalProfit_lastMonth}) {
                                 <td colSpan={2} className='px-2 py-4 border-r border-gray-200 text-blue-800'>
                                 {
                                     formatedCurrency(
-                                        profit?.filter((value) => {
-                                        if (year) {
-                                            if (value?.profit_time?.slice(0, 4) === year) return true;
-                                            return false;
-                                        }
-                                        return true;
-                                    })?.reduce((total, profit) => total + profit?.profit_amount, 0)
+                                        totalOmzet - totalModal
                                     )
                                 }
                                 </td>

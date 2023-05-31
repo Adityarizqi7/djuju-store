@@ -87,18 +87,30 @@ export default function ReportDay({notes}) {
     }
 
     const toPdf = () => {
+
         const doc = new jsPDF()
+
+        const columnStyles = {
+            1: { cellWidth: 20 }, 
+            3: { cellWidth: 22 }, 
+            4: { cellWidth: 22 }, 
+            5: { cellWidth: 15 }, 
+            6: { cellWidth: 22 }, 
+            7: { cellWidth: 22 }, 
+        };
 
         doc.setFontSize(18)
         var pageSize = doc.internal.pageSize
         var pageWidth = pageSize.width ? pageSize.width : pageSize.getWidth()
         var text = doc.splitTextToSize(`Laporan Catatan Penjualan Pada Toko Sembako Djuju - ${convertDateReadble(date)}`, pageWidth - 30, {})
+        var textTwo = doc.splitTextToSize(`Total Omzet: ${costTotal}`, pageWidth - 30, {})
         doc.setLineHeightFactor(1.5)
         doc.text(text, 14, 18)
+        doc.text(textTwo, 14, 40)
 
         autoTable(doc, {
             theme: 'grid',
-            startY: 38,
+            startY: 50,
             head: [
                 [
                     { content: 'Nomor', styles: { fontWeight: 'bold' } },
@@ -106,6 +118,7 @@ export default function ReportDay({notes}) {
                     { content: 'Nama Barang', styles: { fontWeight: 'bold' } },
                     { content: 'Harga Jual', styles: { fontWeight: 'bold' } },
                     { content: 'Jumlah Pembelian', styles: { fontWeight: 'bold' } },
+                    { content: 'Satuan', styles: { fontWeight: 'bold' } },
                     { content: 'Subtotal Biaya', styles: { fontWeight: 'bold' } },
                     { content: 'Total Biaya', styles: { fontWeight: 'bold' } }
                 ]
@@ -124,6 +137,7 @@ export default function ReportDay({notes}) {
                     formatedCurrency(note?.cost_total)
                 ])
             ,
+            columnStyles,
             didParseCell: function (data) {
                 data.cell.styles.halign = 'center';
                 data.cell.styles.valign = 'middle';
@@ -132,7 +146,23 @@ export default function ReportDay({notes}) {
 
         return doc.save(`Laporan Penjualan - ${convertDateReadble(date)}`)
     }
-
+      
+    const totalTransactions = notes
+    .filter(value => {
+        if (date) {
+        if (value?.created_transaction_at?.slice(0, 10) === date) return true;
+        return false;
+        }
+        return true;
+    })
+    .reduce((count, note) => {
+        if (!count.codeRecords.includes(note.transaction_order)) {
+        count.codeRecords.push(note.transaction_order);
+        count.totalTransactions++;
+        }
+        return count;
+    }, { codeRecords: [], totalTransactions: 0 }).totalTransactions;
+      
     useEffect(() => {
         document.addEventListener('keydown', handleFocusInput)
 
@@ -247,9 +277,13 @@ export default function ReportDay({notes}) {
                                     >
                                         Statistik Penjualan {convertDateReadble(date)}
                                     </Dialog.Title>
-                                    <div className="mt-3 border-b border-gray-400/40 pb-2">
+                                    <div className="mt-3 space-y-2 border-b border-gray-400/40 pb-2">
                                         <h1>Total Omset: <strong> {
                                             costTotal
+                                        }</strong>
+                                        </h1>
+                                        <h1>Total Transaksi: <strong> {
+                                            totalTransactions
                                         }</strong>
                                         </h1>
                                     </div>
@@ -342,7 +376,7 @@ export default function ReportDay({notes}) {
                                     id="convert-xls-button"
                                     className="download-table-xls-button"
                                     table="table-data"
-                                    filename={`Laporan Catatan Penjualan Pada Toko Sembako Djuju - ${convertDateReadble(date)}`}
+                                    filename={`Laporan Penjualan Pada Toko Sembako Djuju - ${convertDateReadble(date)}`}
                                     filetype="xls"
                                     sheet="tablexls"
                                     buttonText="Excel"
@@ -384,9 +418,9 @@ export default function ReportDay({notes}) {
                                 <th scope="col" className="px-6 py-3">
                                     Total Biaya
                                 </th>
-                                <th scope="col" className="px-6 py-3">
+                                {/* <th scope="col" className="px-6 py-3">
                                     Aksi
-                                </th>
+                                </th> */}
                             </tr>
                         </thead>
                         <tbody className="montserrat">
@@ -455,11 +489,11 @@ export default function ReportDay({notes}) {
                                         <td data-column='SubTotal Biaya' className="px-3 py-4">
                                             {formatedCurrency(ele?.cost_total)} 
                                         </td>
-                                        <td className="px-6 py-4">
+                                        {/* <td className="px-6 py-4">
                                             <button onClick={(e) => deleteNote(e, ele?.id)}>
                                                 <TrashIcon className="w-5 h-5 text-red-500" />
                                             </button>
-                                        </td>
+                                        </td> */}
                                     </tr>
                                 )
                             })
@@ -475,6 +509,6 @@ export default function ReportDay({notes}) {
 
 ReportDay.layout = page => (
     <AdminLayout title='Laporan Harian - Admin Toko Sembako Djuju' keyword='laporan harian catatan penjualan barang dagangan toko sembako djuju' desc='Halaman untuk megelola laporan harian dagangan yang ada pada Toko Sembako Djuju' >
-        <DashboardLayout children={page} pageName="Laporan Harian" />
+        <DashboardLayout children={page} pageName="Laporan Penjualan Harian" />
     </AdminLayout>
 )

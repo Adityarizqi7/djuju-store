@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\Note;
 use Inertia\Inertia;
 use App\Models\Asset;
+use App\Models\Omzet;
 use App\Models\Profit;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -14,8 +15,10 @@ class ProfitController extends Controller {
     
     public function index(){
 
-        $profit = Profit::all();
+        $asset = Asset::all();
         $products = Product::all();
+        $omzet = Omzet::orderBy('omzet_time', 'asc')->get();
+        // $profit = Profit::orderBy('omzet_time', 'asc')->get();
 
         $now = Carbon::now();
         $lastMonth = $now->subMonth(1);
@@ -31,75 +34,25 @@ class ProfitController extends Controller {
         $totalProfit_lastMonth = $totalOmzet_lastMonth - $totalModal_lastMonth;
 
         return Inertia::render('Admin/Profit/Profit', [
-            'profit' => $profit,
+            'modal' => $asset,
+            'omzet' => $omzet,
+            // 'profit' => $profit,
             'products' => $products,
             'totalProfit_lastMonth' => $totalProfit_lastMonth,
         ]);
     }
 
     public function predict(){
-        $profit = Profit::all();
-        $latest = Profit::latest()->first();
+
+        $omzet = Omzet::whereBetween('omzet_time', ['2022-01', '2022-12'])->get();
+        $asset = Asset::whereBetween('asset_time', ['2022-01', '2022-12'])->get();
+
+        $latest = Omzet::where('omzet_time', 'LIKE', '2022-12%')->get();
 
         return Inertia::render('Admin/Profit/PredictProfit', [
-            'profit' => $profit,
+            'modal' => $asset,
+            'omzet' => $omzet,
             'latest' => $latest,
         ]);
-    }
-
-    public function store(Request $request) {
-
-        $request->validate([    
-            'profit_time' => 'required|unique:profits,profit_time',
-            'profit_amount' => 'numeric|required|regex:/^(?!0+$)[0-9]+$/',
-        ], [
-            'profit_time.required' => 'Kolom Bulan dan Tahun tidak boleh kosong.',
-            'profit_time.unique' => 'Kolom Bulan dan Tahun sudah terdapat pada daftar',
-            'profit_amount.required' => 'Kolom Harga Kulak tidak boleh kosong.',
-            'profit_amount.numeric' => 'Kolom Harga Kulak harus berupa angka.',
-            'profit_amount.regex' => 'Inputan Harga Kulak tidak sesuai dengan validasi yang diminta.',
-        ]);
-        
-        Profit::create([
-            'profit_time' => $request->profit_time,
-            'profit_amount' => $request->profit_amount,
-        ]);
-
-        return redirect()->route('profit.dashboard');
-    }
-
-    public function show($id) {
-
-        $profit = Profit::findOrFail($id);
-
-        return Inertia::render('Admin/Profit/ShowProfit', [
-            'profit' => $profit,
-        ]);
-    }
-
-    public function update(Request $request, $id) {
-        $request->validate([    
-            'profit_time' => 'required',
-            'profit_amount' => 'numeric|required|regex:/^(?!0+$)[0-9]+$/',
-        ], [
-            'profit_time.required' => 'Kolom Bulan dan Tahun tidak boleh kosong.',
-            'profit_amount.required' => 'Kolom Harga Kulak tidak boleh kosong.',
-            'profit_amount.numeric' => 'Kolom Harga Kulak harus berupa angka.',
-            'profit_amount.regex' => 'Inputan Harga Kulak tidak sesuai dengan validasi yang diminta.',
-        ]);
-
-        $profit = Profit::findOrFail($id);
-
-        $profit_data = [
-            'profit_time' => $request->profit_time,
-            'profit_amount' => $request->profit_amount,
-        ];
-        
-        $profit->update($profit_data);
-    }
-
-    public function delete($id) {
-        Profit::destroy($id);
-        return redirect()->route('profit.dashboard');
     }
 }

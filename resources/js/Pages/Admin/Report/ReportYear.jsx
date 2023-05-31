@@ -21,7 +21,8 @@ export default function ReportYear({notes}) {
     const tableDataRef = useRef();
     const downloadButtonRef = useRef(null);
     
-    const [date, setDate] = useState(yearY())
+    const [date, setDate] = useState('2022')
+    // const [date, setDate] = useState(yearY())
     const [isOpen, setIsOpen] = useState(false)
     const [searchNote, setSearchNote] = useState('')
     const [dialogDownloadFile, setDialogDownloadFile] = useState(false)
@@ -56,21 +57,34 @@ export default function ReportYear({notes}) {
     }
 
     const toPdf = () => {
+
         const doc = new jsPDF()
+
+        const columnStyles = {
+            2: { cellWidth: 20 }, 
+            4: { cellWidth: 22 }, 
+            5: { cellWidth: 22 }, 
+            6: { cellWidth: 15 }, 
+            7: { cellWidth: 22 }, 
+            8: { cellWidth: 22 }, 
+        };
 
         doc.setFontSize(18)
         var pageSize = doc.internal.pageSize
         var pageWidth = pageSize.width ? pageSize.width : pageSize.getWidth()
         var text = doc.splitTextToSize(`Laporan Catatan Penjualan Pada Toko Sembako Djuju - Tahun ${date }`, pageWidth - 30, {})
+        var textTwo = doc.splitTextToSize(`Total Omzet: ${costTotal}`, pageWidth - 30, {})
         doc.setLineHeightFactor(1.5)
         doc.text(text, 14, 18)
+        doc.text(textTwo, 14, 40)
 
         autoTable(doc, {
             theme: 'grid',
-            startY: 38,
+            startY: 50,
             head: [
                 [
                     { content: 'Nomor', styles: { fontWeight: 'bold' } },
+                    { content: 'Tanggal Transaksi', styles: { fontWeight: 'bold' } },
                     { content: 'Kode Transaksi', styles: { fontWeight: 'bold' } },
                     { content: 'Nama Barang', styles: { fontWeight: 'bold' } },
                     { content: 'Harga Jual', styles: { fontWeight: 'bold' } },
@@ -91,6 +105,7 @@ export default function ReportYear({notes}) {
                 })
                 ?.map((note, id) => [
                     id + 1,
+                    note?.created_transaction_at,
                     note?.transaction_order,
                     note?.product.name,
                     formatedCurrency(note?.product.sell_price),
@@ -100,6 +115,7 @@ export default function ReportYear({notes}) {
                     formatedCurrency(note?.cost_total)
                 ])
             ,
+            columnStyles,
             didParseCell: function (data) {
                 data.cell.styles.halign = 'center';
                 data.cell.styles.valign = 'middle';
@@ -108,6 +124,23 @@ export default function ReportYear({notes}) {
 
         return doc.save(`Laporan Penjualan - Tahun ${date }`)
     }
+
+    const totalTransactions = notes
+    ?.filter((value) => {
+        if (date) {
+            if (value?.created_transaction_at?.slice(0, value?.created_transaction_at.indexOf("-")) === date) return true;
+            return false;
+        }
+        return false;
+    })
+    
+    .reduce((count, note) => {
+        if (!count.codeRecords.includes(note.transaction_order)) {
+        count.codeRecords.push(note.transaction_order);
+        count.totalTransactions++;
+        }
+        return count;
+    }, { codeRecords: [], totalTransactions: 0 }).totalTransactions;
 
     useEffect(() => {
 
@@ -186,11 +219,15 @@ export default function ReportYear({notes}) {
                                             as="h1"
                                             className="text-lg font-semibold leading-6 text-gray-900"
                                         >
-                                            Statistik Penjualan {date }
+                                            Statistik Penjualan Tahun {date}
                                         </Dialog.Title>
-                                        <div className="mt-3 border-b border-gray-400/40 pb-2">
+                                        <div className="mt-3 space-y-2 border-b border-gray-400/40 pb-2">
                                             <h1>Total Omset: <strong> {
                                                 costTotal
+                                            }</strong>
+                                            </h1>
+                                            <h1>Total Transaksi: <strong> {
+                                                totalTransactions
                                             }</strong>
                                             </h1>
                                         </div>
@@ -298,7 +335,7 @@ export default function ReportYear({notes}) {
                                     id="convert-xls-button"
                                     className="download-table-xls-button"
                                     table="table-data"
-                                    filename={`Laporan Catatan Penjualan Pada Toko Sembako Djuju - Tahun ${date }`}
+                                    filename={`Laporan Penjualan Pada Toko Sembako Djuju - Tahun ${date }`}
                                     filetype="xls"
                                     sheet="tablexls"
                                     buttonText="Excel"
@@ -430,6 +467,6 @@ export default function ReportYear({notes}) {
 
 ReportYear.layout = page => (
     <AdminLayout title='Laporan Tahunan - Admin Toko Sembako Djuju' keyword='laporan tahunan catatan penjualan barang dagangan toko sembako djuju' desc='Halaman untuk megelola laporan mingguan dagangan yang ada pada Toko Sembako Djuju' >
-        <DashboardLayout children={page} pageName="Laporan Tahunan" />
+        <DashboardLayout children={page} pageName="Laporan Penjualan Tahunan" />
     </AdminLayout>
 )

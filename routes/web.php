@@ -59,6 +59,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/note/store', [NotesController::class, 'store'])->name('note.store');
     Route::put('/note/{id}/update', [NotesController::class, 'update_purchase_amount'])->name('note.update');
     Route::put('/note/{id}/saved', [NotesController::class, 'saved'])->name('note.saved');
+    Route::put('/note/{id}/returned_saved', [NotesController::class, 'returned_saved'])->name('note.returned_saved');
     Route::put('/note/finish', [NotesController::class, 'finished'])->name('note.finished');
     Route::delete('/note/{id}/delete', [NotesController::class, 'delete'])->name('note.delete');
     Route::post('/transaction/store', [TransactionsController::class, 'store'])->name('transaction.store');

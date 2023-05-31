@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from '@inertiajs/react';
   
 export default function Pagination({ links }) {
@@ -11,8 +11,15 @@ export default function Pagination({ links }) {
         }
     }
 
+    
     function getSymbolPage(text) {
-        return text === '&laquo; Previous' ? text.replace('&laquo; Previous', '←') : text.replace('Next &raquo;', '→')     
+        if (text === '&laquo; Previous') {
+            return '←';
+        } else if (text === 'Next &raquo;') {
+            return '→';
+        } else {
+            return '';
+        }
     }
   
     return (
@@ -26,7 +33,7 @@ export default function Pagination({ links }) {
                                 key={key}
                                 className="mr-1 mb-1 px-4 py-3 text-sm leading-4 text-gray-400 border rounded"
                             >
-                                {getSymbolPage(String(link?.label))}
+                                {getSymbolPage(link?.label)}
                             </div>
                         ) 
                         :

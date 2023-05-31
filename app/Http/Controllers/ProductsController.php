@@ -5,12 +5,13 @@ namespace App\Http\Controllers;
 use Inertia\Inertia;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductsController extends Controller
 {
     public function index() {
 
-        $all_product = Product::orderBy('name', 'asc')->paginate(8);
+        $all_product = Product::orderBy('name', 'asc')->get();
         return Inertia::render('Admin/Product/Product', [
             'products' => $all_product,
         ]);
@@ -48,14 +49,24 @@ class ProductsController extends Controller
             'stock.regex' => 'Inputan Harga Awal tidak sesuai dengan validasi yang diminta.',
         ]);
 
-        Product::create([
-            'name' => $request->name,
-            'unit' => $request->unit,
-            'stock' => $request->stock,
-            'product_code' => $request->product_code,
-            'sell_price' => $request->sell_price,
-            'initial_price' => $request->initial_price,
-        ]);
+        DB::beginTransaction();
+
+        try {
+            Product::create([
+                'name' => $request->name,
+                'unit' => $request->unit,
+                'stock' => $request->stock,
+                'product_code' => $request->product_code,
+                'sell_price' => $request->sell_price,
+                'initial_price' => $request->initial_price,
+            ]);        
+            
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            report($e->getMessage());
+            return false;
+        }
 
         return redirect()->route('product.create');
     }

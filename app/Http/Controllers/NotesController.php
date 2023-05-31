@@ -19,8 +19,6 @@ class NotesController extends Controller {
                 ->where('is_finished', 'N')
                 ->get();
 
-        // $current_time = Carbon::now()->locale('id')->format('l, d F Y');        
-
         return Inertia::render('Admin/Note/Note', [
             'notes' => $all_note,
             'products' => $products,
@@ -46,18 +44,20 @@ class NotesController extends Controller {
             DB::beginTransaction();
 
             $product = Product::find($request->product_id);
-            $newStock = $product->stock - $request->purchase_amount;
-        
+            $purchaseAmount = $request->purchase_amount;
+            $currentStock = $product->stock;
+            
+            $newStock = $currentStock - $purchaseAmount;
             $product->update(['stock' => $newStock]);
-        
+            
             Note::create([
                 'product_id' => $request->product_id,
                 'code_record' => $request->code_record,
-                'purchase_amount' => $request->purchase_amount,
+                'purchase_amount' => $purchaseAmount,
                 'is_saved' => 'N',
                 'is_session' => 'Y',
                 'is_finished' => 'N',
-            ]);
+            ]);            
 
             DB::commit();
         } catch (\Exception $e) {
@@ -80,12 +80,24 @@ class NotesController extends Controller {
             DB::beginTransaction();
             
             $note = Note::findOrFail($id);
-    
+            $oldPurchaseAmount = $note->purchase_amount;
+
             $note_data = [
                 'purchase_amount' => $request->purchase_amount,
             ];
     
             $note->update($note_data);
+
+            $newPurchaseAmount = $note->purchase_amount;
+            $purchaseAmountChange = $newPurchaseAmount - $oldPurchaseAmount;
+
+            $productId = $note->product_id;
+            $product = Product::findOrFail($productId);
+            $oldStock = $product->stock;
+
+            $newStock = $oldStock - $purchaseAmountChange;
+
+            $product->update(['stock' => $newStock]);
 
             DB::commit();
         } catch (\Exception $e) {
@@ -108,6 +120,35 @@ class NotesController extends Controller {
         $note_data = [
             'cost_subtotal' => $note->purchase_amount * $note->product->sell_price,
             'is_saved' => 'Y',
+        ];
+
+        try {
+            DB::beginTransaction();
+
+            $note->update($note_data);
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw new \Exception($e->getMessage());
+        }
+
+
+        return redirect()->route('note.dashboard');
+    }
+
+    public function returned_saved(Request $request, $id) {
+        $request->validate([    
+            'cost_subtotal' => 'numeric',
+        ], [
+            'cost_subtotal.numeric' => 'Kolom Jumlah Barang harus berupa angka.',
+        ]);
+
+        $note = Note::findOrFail($id);
+
+        $note_data = [
+            'cost_subtotal' => $note->purchase_amount * $note->product->sell_price,
+            'is_saved' => 'N',
         ];
 
         try {
@@ -150,7 +191,7 @@ class NotesController extends Controller {
             'is_finished' => 'Y',
             'cost_total' => $int_costSubtotal,
             'transaction_order' => $request->transaction_order,
-            'created_transaction_at' => Carbon::now(),
+            'created_transaction_at' => $request->created_transaction_at,
         ];
 
         DB::beginTransaction();
@@ -168,21 +209,14 @@ class NotesController extends Controller {
 
     public function delete($id) {
 
-        try {
-            DB::beginTransaction();
+        $note = Note::findOrFail($id);
+        $product = $note->product;
+        $purchaseAmount = $note->purchase_amount;
 
-            $note = Note::findOrFail($id);
+        $newStock = $product->stock + $purchaseAmount;
+        $product->update(['stock' => $newStock]);
 
-            $product = $note->product;
-            $product->increment('stock');
-
-            Note::destroy($id);
-
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw new \Exception($e->getMessage());
-        }
+        Note::destroy($id);
 
         return redirect()->route('note.dashboard');
     }

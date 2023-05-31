@@ -12,7 +12,7 @@ import SuccessAlert from "@/Components/alert/SuccessAlert";
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { now, monthYM, convertMonthReadble, yearY, oneMonthBefore } from '@/Utils/Date';
 
-export default function Omzet({omzet, totalCostSubtotal_lastMonth}) {
+export default function Omzet({modal, omzet, totalCostSubtotal_lastMonth}) {
 
     const inputRef = useRef()
     const formNoteRef = useRef()
@@ -180,7 +180,7 @@ export default function Omzet({omzet, totalCostSubtotal_lastMonth}) {
                     <table className="w-full text-[1.05rem] text-center text-neutral-800">
                         <thead className="text-white uppercase poppins">
                             <tr className="bg-transparent border-x border-t border-b-0 border-orange-600">
-                                <th scope="col" colSpan={4} className="px-6 py-6 text-neutral-900 text-[1.25rem]">
+                                <th scope="col" colSpan={5} className="px-6 py-6 text-neutral-900 text-[1.25rem]">
                                     Omzet Bulanan Pada Tahun {year}
                                 </th>
                             </tr>
@@ -192,7 +192,10 @@ export default function Omzet({omzet, totalCostSubtotal_lastMonth}) {
                                     Bulan
                                 </th>
                                 <th scope="col" className="px-6 py-3">
-                                    Jumlah Omzet
+                                    Nominal Omzet
+                                </th>
+                                <th scope="col" className="px-6 py-3">
+                                    Nominal Profit
                                 </th>
                                 <th scope="col" className="px-6 py-3">
                                     Aksi
@@ -204,7 +207,7 @@ export default function Omzet({omzet, totalCostSubtotal_lastMonth}) {
                             omzet?.length < 1 ?
                             (
                                 <tr className="bg-white border-b">
-                                    <td colSpan={4} className="px-6 py-6 text-[1.25rem] text-center">
+                                    <td colSpan={5} className="px-6 py-6 text-[1.25rem] text-center">
                                          Tidak ada omzet pada tahun {year}
                                     </td>
                                 </tr>
@@ -219,6 +222,9 @@ export default function Omzet({omzet, totalCostSubtotal_lastMonth}) {
                                 return true;
                             })
                             ?.map((ele, i) => {
+                                const totalProfit = modal
+                                    ?.filter((value) => value?.asset_time === ele?.omzet_time)
+                                    ?.reduce((accumulator, currentValue) => accumulator + (currentValue?.cost_total || 0), 0);
                                 return (
                                     <tr key={i + 1} className="bg-white border-b even:bg-slate-50">
                                         <td data-column='Nomor' className="px-3 py-4">
@@ -230,6 +236,11 @@ export default function Omzet({omzet, totalCostSubtotal_lastMonth}) {
                                         <td data-column='Nominal Omset' className="px-3 py-4">
                                         {
                                             formatedCurrency(ele?.omzet_amount)
+                                        }
+                                        </td>
+                                        <td data-column='Nominal Profit' className="px-3 py-4">
+                                        {
+                                            formatedCurrency(ele?.omzet_amount - totalProfit)
                                         }
                                         </td>
                                         <td data-column='Aksi' className="px-6 py-4 flex justify-center items-center space-x-2">

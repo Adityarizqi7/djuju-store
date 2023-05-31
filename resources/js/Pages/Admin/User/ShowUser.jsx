@@ -26,8 +26,7 @@ export default function ShowUser({user}) {
         phone: user?.phone,
         role: user?.role,
     });
-
-    console.log(errors)
+    
     const valuesEmpty = () => {
         return data?.name === '' || data?.email === '' || data?.address === '' || data?.phone === '' || data?.role === ''
     }

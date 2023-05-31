@@ -80,9 +80,11 @@ export default function Modal({products, modal}) {
         const { name, value } = e.target;
         if (name === 'product_id') {
           const product = products.find((p) => p.id === parseInt(value));
-          setData(prevData => ({ ...prevData, [name]: value, initial_price: product?.initial_price || '' }));
+          setData(prevData => ({ ...prevData, [name]: parseInt(value), initial_price: product?.initial_price || '' }));
+        } else if (name === 'asset_time' || name === 'product_name') {
+            setData(prevData => ({ ...prevData, [name]: value }));
         } else {
-          setData(prevData => ({ ...prevData, [name]: value }));
+          setData(prevData => ({ ...prevData, [name]: parseInt(value) }));
         }
     };
 
@@ -99,7 +101,7 @@ export default function Modal({products, modal}) {
         post(route('asset.store'), {
             onSuccess() {
                 setSuccessCreate(true)
-                setData({product_id: '', product_name: '', initial_price: '', asset_time: monthYM()})
+                setData({product_id: '', product_name: '', initial_price: '', purchase_amount: '', cost_total: '', asset_time: monthYM()})
             },
             onStart() {
                 setSuccessCreate(false)
@@ -154,7 +156,13 @@ export default function Modal({products, modal}) {
                                 facingMode='user'
                                 onUpdate={(err, result) => {
                                     if(result) {
-                                        setData(prevState => ({ ...prevState, product_id: result.text }));
+                                        const productId = parseInt(result.text);
+                                        const product = products.find((p) => p.id === productId);
+                                        if (product) {
+                                            setData(prevData => ({ ...prevData, product_id: productId, initial_price: product.initial_price || '' }));
+                                        } else {
+                                            setData(prevData => ({ ...prevData, product_id: productId }));
+                                        }
                                         // inputSubmitNote.current.click() Submit Otomatis
                                     }
                                 }}
@@ -188,7 +196,7 @@ export default function Modal({products, modal}) {
                                     {
                                         products?.map(e => {
                                             return (
-                                                <option key={e?.id} className='py-2 px-1' value={e?.id}>{e?.name}</option>
+                                                <option key={e?.id} className='py-2 px-1' value={e?.id}>{e?.name} - {formatedCurrency(e?.initial_price)}</option>
                                             )
                                         })
                                     }
@@ -235,7 +243,7 @@ export default function Modal({products, modal}) {
                             <div className={`form-control flex-1`}>
                                 <input type="number" name='purchase_amount' id="purchase_amount" onChange={handleOnChange} value={
                                     data?.purchase_amount
-                                } className='rounded-[5px] montserrat w-full' placeholder='Jumlah Barang' />
+                                } className='rounded-[5px] montserrat w-full' placeholder='Banyak benda' />
                                 <InputError message={
                                     errors.hasOwnProperty('purchase_amount') === true &&
                                     errors?.purchase_amount
@@ -339,6 +347,9 @@ export default function Modal({products, modal}) {
                                     Nama Barang
                                 </th>
                                 <th scope="col" className="px-6 py-3">
+                                    Satuan Barang
+                                </th>
+                                <th scope="col" className="px-6 py-3">
                                     Harga Kulak
                                 </th>
                                 <th scope="col" className="px-6 py-3">
@@ -357,7 +368,7 @@ export default function Modal({products, modal}) {
                             modal?.length < 1 ?
                             (
                                 <tr className="bg-white border-b">
-                                    <td colSpan={4} className="px-6 py-6 text-[1.25rem] text-center">
+                                    <td colSpan={8} className="px-6 py-6 text-[1.25rem] text-center">
                                          Tidak ada modal pada bulan
                                     </td>
                                 </tr>
@@ -390,9 +401,14 @@ export default function Modal({products, modal}) {
                                             limitString(ele?.product_name, 25)
                                         }
                                         </td>
+                                        <td data-column='Satuan Barang' className="px-3 py-4">
+                                        {
+                                            ele?.product?.unit
+                                        }
+                                        </td>
                                         <td data-column='Harga Awal' className="px-3 py-4">
                                         {
-                                            ele?.initial_price
+                                            formatedCurrency(ele?.initial_price)
                                         }
                                         </td>
                                         <td data-column='Jumlah Barang' className="px-3 py-4">
@@ -402,16 +418,18 @@ export default function Modal({products, modal}) {
                                         </td>
                                         <td data-column='Harga Barang' className="px-3 py-4">
                                         {
-                                            ele?.cost_total
+                                            formatedCurrency(ele?.cost_total)
                                         }
                                         </td>
-                                        <td data-column='Aksi' className="px-6 py-4 flex justify-center items-center space-x-2">
-                                            <Link href={route('asset.edit', ele?.id)}>
-                                                <PencilSquareIcon className="w-6 h-6 text-blue-600" />
-                                            </Link>
-                                            <button onClick={(el) => deleteAsset(el, ele?.id)}>
-                                                <TrashIcon className="w-5 h-5 text-red-500" />
-                                            </button>
+                                        <td data-column='Aksi'>
+                                            <div className="px-6 py-4 flex justify-center items-center space-x-2">
+                                                <Link href={route('asset.edit', ele?.id)}>
+                                                    <PencilSquareIcon className="w-6 h-6 text-blue-600" />
+                                                </Link>
+                                                <button onClick={(el) => deleteAsset(el, ele?.id)}>
+                                                    <TrashIcon className="w-5 h-5 text-red-500" />
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 )
@@ -420,8 +438,8 @@ export default function Modal({products, modal}) {
                         </tbody>
                         <tfoot>
                             <tr className='montserrat border-b bg-gray-100'>
-                                <td colSpan={3} className='px-2 py-4 border-r border-gray-200 text-[1.25rem] font-semibold'>Total Modal</td>
-                                <td colSpan={2} className='px-2 py-4 border-r border-gray-200 text-blue-800'>
+                                <td colSpan={5} className='px-2 py-4 border-r border-gray-200 text-[1.25rem] font-semibold'>Total Modal</td>
+                                <td colSpan={3} className='px-2 py-4 border-r border-gray-200 text-blue-800'>
                                 {
                                     formatedCurrency(
                                         modal
@@ -432,7 +450,7 @@ export default function Modal({products, modal}) {
                                             }
                                             return true;
                                         })
-                                        ?.reduce((total, asset) => total + asset?.initial_price, 0)
+                                        ?.reduce((total, asset) => total + asset?.cost_total, 0)
                                     )
                                 }
                                 </td>

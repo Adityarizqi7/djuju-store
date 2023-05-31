@@ -1,4 +1,5 @@
-import QRCode from "react-qr-code";
+import QRCode from "qrcode.react";
+// import QRCode from "react-qr-code";
 import AdminLayout from "@/Layouts/AdminLayout";
 import { Link, useForm } from "@inertiajs/react";
 import React, { useEffect, useRef, useState, useCallback } from "react";
@@ -51,6 +52,14 @@ export default function Product({products}) {
         },
         [inputRef, deleteText]
     )
+
+    function handleDownloadQRCode(e) {
+        const canvas = e.currentTarget.querySelector('canvas');
+        const link = document.createElement('a');
+        link.download = `BRG -`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    }
 
     useEffect(() => {
         document.addEventListener('keydown', handleFocusInput)
@@ -145,7 +154,7 @@ export default function Product({products}) {
                         </thead>
                         <tbody className="montserrat">
                         {
-                            products?.data?.length < 1 ?
+                            products?.length < 1 ?
                             (
                                 <tr className="bg-white border-b">
                                     <td colSpan={7} className="px-6 py-4 text-[1.25rem]">
@@ -154,7 +163,7 @@ export default function Product({products}) {
                                 </tr>
                             )  
                             :
-                            products?.data
+                            products
                             ?.filter(value => {
                                 // eslint-disable-line array-callback-return
                                 if (searchProduct === '')
@@ -210,7 +219,9 @@ export default function Product({products}) {
                                             {e?.stock}
                                         </td>
                                         <td className="px-6 py-4">
-                                            <QRCode value={String(e?.id)} size={40} className='cursor-pointer' style={{ height: "auto", maxWidth: "100%", width: "100%" }} />
+                                            <div onClick={handleDownloadQRCode} style={{cursor: 'pointer'}}>
+                                                <QRCode value={String(e?.id)} size={80} style={{ height: "auto", maxWidth: "100%", width: "100%" }} />
+                                            </div>
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex justify-center items-center gap-2">
@@ -229,7 +240,7 @@ export default function Product({products}) {
                         </tbody>
                     </table>
 
-                    <Pagination className='mt-6' links={products?.links}/>
+                    {/* <Pagination className='mt-6' links={products?.links}/> */}
                 </div>
             </div>
         </div>

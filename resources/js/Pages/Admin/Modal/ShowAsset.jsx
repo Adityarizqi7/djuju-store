@@ -99,13 +99,25 @@ export default function ShowAsset({products, modal}) {
     return (
         <div className="show-asset-component">
             <div id="container_show_asset">
-                <Link href={route('asset.dashboard')} className='back-section mt-8 flex items-center gap-x-2'>
-                    <ArrowLeftIcon className='w-6 h-6' />
-                    <h3 className="montserrat font-medium">Daftar Modal</h3>
-                </Link>
+                <div className='flex items-center justify-between mt-8'>
+                    <Link href={route('asset.dashboard')} className='back-section flex items-center gap-x-2'>
+                        <ArrowLeftIcon className='w-6 h-6' />
+                        <h3 className="montserrat font-medium">Daftar Modal</h3>
+                    </Link>
+                    <div>
+                    {
+                        scanShow === true &&
+                        <span className="absolute flex h-3 w-3">
+                            <span className="animate-ping absolute z-0 inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                        </span>
+                    }
+                        <QrCodeIcon className='w-10 h-10 text-neutral-900 cursor-pointer' onClick={handleScannerDialog} />
+                    </div>
+                </div>
                 {
                     successEdit === true &&
-                    <SuccessAlert msg_primary={'Berhasil diubah! '} msg_detail={`Ddata Modal telah diubah.`} className={'mt-8'} />
+                    <SuccessAlert msg_primary={'Berhasil diubah! '} msg_detail={`Data Modal telah diubah.`} className={'mt-8'} />
                 }
                 {
                     scanShow === true &&
@@ -118,7 +130,13 @@ export default function ShowAsset({products, modal}) {
                                 facingMode='user'
                                 onUpdate={(err, result) => {
                                     if(result) {
-                                        setData(prevState => ({ ...prevState, product_id: result.text }));
+                                        const productId = parseInt(result.text);
+                                        const product = products.find((p) => p.id === productId);
+                                        if (product) {
+                                            setData(prevData => ({ ...prevData, product_id: productId, initial_price: product.initial_price || '' }));
+                                        } else {
+                                            setData(prevData => ({ ...prevData, product_id: productId }));
+                                        }
                                         // inputSubmitNote.current.click() Submit Otomatis
                                     }
                                 }}
@@ -127,7 +145,7 @@ export default function ShowAsset({products, modal}) {
                     </>
                 }
                 <div className="form-control mt-10 relative z-[6]">
-                    <input type="text" name='search-product' id="search-product" className='rounded-[5px] montserrat w-full' placeholder='Cari informasi barang' onChange={handleSearchProductChange} value={searchProduct} />
+                    <input type="text" name='search-product' id="search-product" className='rounded-[5px] montserrat w-full' placeholder='Cari informasi barang (id, nama)' onChange={handleSearchProductChange} value={searchProduct} />
                     {
                         searchProduct !== '' &&
                         <div className="absolute z-[2] top-14 bg-white shadow-own rounded-[5px] p-3 montserrat w-[100%]"> 
@@ -220,14 +238,14 @@ export default function ShowAsset({products, modal}) {
                                 </Tooltip>
                             </div>
                             <div className='form-control flex-1'>
-                                <InputLabel classStar='hidden' htmlFor="product_name" value="Nama Modal" className='text-[1.15rem] mb-3' />
+                                <InputLabel classStar='hidden' htmlFor="product_name" value="Nama Modal (selain barang dagangan)" className='text-[1.15rem] mb-3' />
                                 <TextInput
                                     id="product_name"
                                     type="text"
                                     name="product_name"
                                     value={data?.product_name}
                                     autoComplete='on'
-                                    placeholder='Nama modal'
+                                    placeholder='Gaji Pegawai'
                                     onChange={handleOnChange}
                                     className={`${errors.hasOwnProperty('product_name') === true && ' border border-solid border-red-500'} ${data?.product_id !== '' && 'pointer-events-none opacity-30'} w-full`}
                                 />
@@ -252,10 +270,10 @@ export default function ShowAsset({products, modal}) {
                                 } className={`${errors?.initial_price && 'block'} mt-2 xxs:w-full`} />
                             </div>
                             <div className='form-control flex-1'>
-                                <InputLabel classStar='hidden' htmlFor="purchase_amount" value="Jumlah Barang" className='text-[1.15rem] mb-3' />
+                                <InputLabel classStar='hidden' htmlFor="purchase_amount" value="Banyak Benda" className='text-[1.15rem] mb-3' />
                                 <input type="number" name='purchase_amount' id="purchase_amount" onChange={handleOnChange} value={
                                     data?.purchase_amount
-                                } className='rounded-[5px] montserrat w-full' placeholder='Jumlah Barang' />
+                                } className='rounded-[5px] montserrat w-full' placeholder='Banyak Benda' />
                                 <InputError message={
                                     errors.hasOwnProperty('purchase_amount') === true &&
                                     errors?.purchase_amount
@@ -284,7 +302,7 @@ export default function ShowAsset({products, modal}) {
                         </div>
                         <button className={` ${processing && ' pointer-events-none'} focus:outline-none bg-blue-200 hover:bg-blue-500 text-blue-800 hover:text-white transition-colors duration-200 montserrat px-3 py-2 rounded-[5px] w-full`} ref={inputSubmitNote} disabled={processing}>
                             {
-                                processing ? <Spin /> :  'Perbarui Modal'
+                                processing ? <Spin /> :  'Perbarui Data'
                             }
                         </button>
                     </form>

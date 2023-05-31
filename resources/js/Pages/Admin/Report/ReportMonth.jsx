@@ -22,7 +22,8 @@ export default function ReportMonth({notes, modal}) {
     const downloadButtonRef = useRef(null);
     
     const [isOpen, setIsOpen] = useState(false)
-    const [date, setDate] = useState(monthYM())
+    const [date, setDate] = useState('2022-01')
+    // const [date, setDate] = useState(monthYM())
     const [searchNote, setSearchNote] = useState('')
     const [dialogDownloadFile, setDialogDownloadFile] = useState(false)
 
@@ -67,21 +68,34 @@ export default function ReportMonth({notes, modal}) {
     }
 
     const toPdf = () => {
+
         const doc = new jsPDF()
+
+        const columnStyles = {
+            2: { cellWidth: 20 }, 
+            4: { cellWidth: 22 }, 
+            5: { cellWidth: 22 }, 
+            6: { cellWidth: 15 }, 
+            7: { cellWidth: 22 }, 
+            8: { cellWidth: 22 }, 
+        };
 
         doc.setFontSize(18)
         var pageSize = doc.internal.pageSize
         var pageWidth = pageSize.width ? pageSize.width : pageSize.getWidth()
         var text = doc.splitTextToSize(`Laporan Catatan Penjualan Pada Toko Sembako Djuju - ${convertMonthReadble(date)}`, pageWidth - 30, {})
+        var textTwo = doc.splitTextToSize(`Total Omzet: ${costTotal}`, pageWidth - 30, {})
         doc.setLineHeightFactor(1.5)
         doc.text(text, 14, 18)
+        doc.text(textTwo, 14, 40)
 
         autoTable(doc, {
             theme: 'grid',
-            startY: 38,
+            startY: 50,
             head: [
                 [
                     { content: 'Nomor', styles: { fontWeight: 'bold' } },
+                    { content: 'Tanggal Transaksi', styles: { fontWeight: 'bold' } },
                     { content: 'Kode Transaksi', styles: { fontWeight: 'bold' } },
                     { content: 'Nama Barang', styles: { fontWeight: 'bold' } },
                     { content: 'Harga Jual', styles: { fontWeight: 'bold' } },
@@ -102,6 +116,7 @@ export default function ReportMonth({notes, modal}) {
                 })
                 ?.map((note, id) => [
                     id + 1,
+                    note?.created_transaction_at,
                     note?.transaction_order,
                     note?.product.name,
                     formatedCurrency(note?.product.sell_price),
@@ -111,6 +126,7 @@ export default function ReportMonth({notes, modal}) {
                     formatedCurrency(note?.cost_total)
                 ])
             ,
+            columnStyles,
             didParseCell: function (data) {
                 data.cell.styles.halign = 'center';
                 data.cell.styles.valign = 'middle';
@@ -119,6 +135,22 @@ export default function ReportMonth({notes, modal}) {
 
         return doc.save(`Laporan Penjualan - ${convertMonthReadble(date)}`)
     }
+
+    const totalTransactions = notes
+    ?.filter((value) => {
+        if (date) {
+            if (value?.created_transaction_at?.slice(0, 7) === date) return true;
+            return false;
+        }
+        return true;
+    })
+    .reduce((count, note) => {
+        if (!count.codeRecords.includes(note.transaction_order)) {
+            count.codeRecords.push(note.transaction_order);
+            count.totalTransactions++;
+        }
+        return count;
+    }, { codeRecords: [], totalTransactions: 0 }).totalTransactions;
 
     useEffect(() => {
 
@@ -135,7 +167,7 @@ export default function ReportMonth({notes, modal}) {
         return () => {
             document.removeEventListener('click', handleClickOutside, true);
         }
-    }, [])
+    }, [totalTransactions])
 
     return (
         <div className="report-month-component">
@@ -199,13 +231,13 @@ export default function ReportMonth({notes, modal}) {
                                         >
                                             Statistik Penjualan {convertMonthReadble(date)}
                                         </Dialog.Title>
-                                        <div className="mt-3 border-b border-gray-400/40 pb-2 space-y-3">
+                                        <div className="mt-3 border-b border-gray-400/40 pb-2 space-y-2">
                                             <h1>Total Omset: <strong> {
                                                 costTotal
                                             }</strong>
                                             </h1>
-                                            <h1>Total Profit: <strong> {
-                                                profitTotal
+                                            <h1>Total Transaksi: <strong> {
+                                                totalTransactions
                                             }</strong>
                                             </h1>
                                         </div>
@@ -267,7 +299,7 @@ export default function ReportMonth({notes, modal}) {
                                                             }
                                                             return true;
                                                         })
-                                                        ?.filter(e => e?.product?.unit === "kardus")
+                                                        ?.filter(e => e?.product?.unit === "kotak")
                                                         .map(e => {
                                                             return e?.purchase_amount;
                                                         })
@@ -276,7 +308,7 @@ export default function ReportMonth({notes, modal}) {
                                                         }, 0)
                                                     } 
                                                     </strong>
-                                                    {' '} barang terjual dengan satuan <i>'kardus'</i>
+                                                    {' '} barang terjual dengan satuan <i>'kardus / kotak'</i>
                                                 </h2>
                                             </div>
                                         </div>
@@ -313,7 +345,7 @@ export default function ReportMonth({notes, modal}) {
                                     id="convert-xls-button"
                                     className="download-table-xls-button"
                                     table="table-data"
-                                    filename={`Laporan Catatan Penjualan Pada Toko Sembako Djuju - ${convertMonthReadble(date)}`}
+                                    filename={`Laporan Penjualan Pada Toko Sembako Djuju - ${convertMonthReadble(date)}`}
                                     filetype="xls"
                                     sheet="tablexls"
                                     buttonText="Excel"
@@ -445,6 +477,6 @@ export default function ReportMonth({notes, modal}) {
 
 ReportMonth.layout = page => (
     <AdminLayout title='Laporan Bulanan - Admin Toko Sembako Djuju' keyword='laporan bulanan catatan penjualan barang dagangan toko sembako djuju' desc='Halaman untuk megelola laporan mingguan dagangan yang ada pada Toko Sembako Djuju' >
-        <DashboardLayout children={page} pageName="Laporan Bulanan" />
+        <DashboardLayout children={page} pageName="Laporan Penjualan Bulanan" />
     </AdminLayout>
 )

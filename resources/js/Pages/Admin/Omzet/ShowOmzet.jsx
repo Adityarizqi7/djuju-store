@@ -106,7 +106,7 @@ export default function ShowOmzet({omzet}) {
                     </div>
                     <button className={` ${processing && ' pointer-events-none'} focus:outline-none bg-blue-200 hover:bg-blue-500 text-blue-800 hover:text-white transition-colors duration-200 montserrat px-3 py-2 rounded-[5px] w-full`} ref={inputSubmitNote} disabled={processing}>
                         {
-                            processing ? <Spin /> :  'Simpan Modal'
+                            processing ? <Spin /> :  'Perbarui Data'
                         }
                     </button>
                 </form>

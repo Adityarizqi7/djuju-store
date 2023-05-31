@@ -8,8 +8,8 @@ const time = date.toLocaleTimeString('id-ID');
 const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 const formattedDate = date.toLocaleDateString('id-ID', options);
 
-export let startDateFormatted = 0
-export let endDateFormatted = 0
+export let startDateFormatted = ''
+export let endDateFormatted = ''
 
 export const dateNow = () => {
     return date
@@ -63,33 +63,15 @@ export const weekYW = () => {
 export const convertWeekReadble = (weekParam) => {
 
     const year = weekParam.substr(0, 4);
-    const weekNumber = weekParam.substr(6, 2);
+    const week = weekParam.substr(6, 2);
 
-    const startDate = moment(year + '-01-01').startOf('isoWeek');
-    const endDate = moment(year + '-12-31').endOf('isoWeek');
-
-    let currentDate = startDate;
-    let startWeek = 0;
-    let endWeek = 0;
-
-    while (currentDate <= endDate) {
-        const weekOfYear = currentDate.format('w');
-        const yearOfCurrentDate = currentDate.format('YYYY');
-
-        if (yearOfCurrentDate === year && weekOfYear === weekNumber) {
-            startWeek = currentDate.clone().startOf('isoWeek');
-            endWeek = currentDate.clone().endOf('isoWeek');
-            break;
-        }
-
-        currentDate = currentDate.add(1, 'week');
-    }
-
-    startDateFormatted = startWeek.format('YYYY-MM-DD');
-    endDateFormatted = endWeek.format('YYYY-MM-DD');
+    const startDate = moment().isoWeekYear(year).isoWeek(week).startOf('isoWeek').format('YYYY-MM-DD');
+    const endDate = moment().isoWeekYear(year).isoWeek(week).endOf('isoWeek').format('YYYY-MM-DD');
 
     // 2023-03-24 / 2023-03-30
-    return `${convertDateReadble(startDateFormatted)} / ${convertDateReadble(endDateFormatted)}`;
+    startDateFormatted = startDate;
+    endDateFormatted = endDate;
+    return `${convertDateReadble(startDate)} / ${convertDateReadble(endDate)}`;
 }
 
 export const monthYM = () => {

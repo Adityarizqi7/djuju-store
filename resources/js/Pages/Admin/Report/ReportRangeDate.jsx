@@ -64,21 +64,34 @@ export default function ReportRangeDate({notes}) {
     }
 
     const toPdf = () => {
+
         const doc = new jsPDF()
+
+        const columnStyles = {
+            2: { cellWidth: 20 }, 
+            4: { cellWidth: 22 }, 
+            5: { cellWidth: 22 }, 
+            6: { cellWidth: 15 }, 
+            7: { cellWidth: 22 }, 
+            8: { cellWidth: 22 }, 
+        };
 
         doc.setFontSize(18)
         var pageSize = doc.internal.pageSize
         var pageWidth = pageSize.width ? pageSize.width : pageSize.getWidth()
         var text = doc.splitTextToSize(`Laporan Catatan Penjualan Pada Toko Sembako Djuju - ${state.map(e => rangeDateReadble(rangeDateSplit(e?.startDate)) + ' / ' + rangeDateReadble(rangeDateSplit(e?.endDate)))}`, pageWidth - 30, {})
+        var textTwo = doc.splitTextToSize(`Total Omzet: ${costTotal}`, pageWidth - 30, {})
         doc.setLineHeightFactor(1.5)
         doc.text(text, 14, 18)
+        doc.text(textTwo, 14, 40)
 
         autoTable(doc, {
             theme: 'grid',
-            startY: 38,
+            startY: 50,
             head: [
                 [
                     { content: 'Nomor', styles: { fontWeight: 'bold' } },
+                    { content: 'Tanggal Transaksi', styles: { fontWeight: 'bold' } },
                     { content: 'Kode Transaksi', styles: { fontWeight: 'bold' } },
                     { content: 'Nama Barang', styles: { fontWeight: 'bold' } },
                     { content: 'Harga Jual', styles: { fontWeight: 'bold' } },
@@ -96,6 +109,7 @@ export default function ReportRangeDate({notes}) {
                 })
                 ?.map((note, id) => [
                     id + 1,
+                    note?.created_transaction_at,
                     note?.transaction_order,
                     note?.product.name,
                     formatedCurrency(note?.product.sell_price),
@@ -105,6 +119,7 @@ export default function ReportRangeDate({notes}) {
                     formatedCurrency(note?.cost_total)
                 ])
             ,
+            columnStyles,
             didParseCell: function (data) {
                 data.cell.styles.halign = 'center';
                 data.cell.styles.valign = 'middle';
@@ -113,6 +128,19 @@ export default function ReportRangeDate({notes}) {
 
         return doc.save(`Laporan Penjualan - ${state.map(e => rangeDateReadble(rangeDateSplit(e?.startDate)) + ' / ' + rangeDateReadble(rangeDateSplit(e?.endDate)))}`)
     }
+
+    const totalTransactions = notes
+    ?.filter((value) => {
+        const createdTransaction = value?.created_transaction_at?.split(" ")[0]
+        return createdTransaction >= state.map(e => rangeDateYMD(rangeDateSplit(e?.startDate))) && createdTransaction <= state.map(e => rangeDateYMD(rangeDateSplit(e?.endDate)))
+    })
+    .reduce((count, note) => {
+        if (!count.codeRecords.includes(note.transaction_order)) {
+        count.codeRecords.push(note.transaction_order);
+        count.totalTransactions++;
+        }
+        return count;
+    }, { codeRecords: [], totalTransactions: 0 }).totalTransactions;
 
     useEffect(() => {
 
@@ -220,9 +248,13 @@ export default function ReportRangeDate({notes}) {
                                         >
                                             Statistik Penjualan {state.map(e => rangeDateReadble(rangeDateSplit(e?.startDate)) + ' / ' + rangeDateReadble(rangeDateSplit(e?.endDate)))}
                                         </Dialog.Title>
-                                        <div className="mt-3 border-b border-gray-400/40 pb-2">
+                                        <div className="mt-3 space-y-2 border-b border-gray-400/40 pb-2">
                                             <h1>Total Omset: <strong> {
                                                 costTotal
+                                            }</strong>
+                                            </h1>
+                                            <h1>Total Transaksi: <strong> {
+                                                totalTransactions
                                             }</strong>
                                             </h1>
                                         </div>
@@ -438,7 +470,7 @@ export default function ReportRangeDate({notes}) {
 }
 
 ReportRangeDate.layout = page => (
-    <AdminLayout title='Laporan Rentang Tanggal - Admin Toko Sembako Djuju' keyword='laporan rentang tanggal catatan penjualan barang dagangan toko sembako djuju' desc='Halaman untuk megelola laporan rentang tanggal dagangan yang ada pada Toko Sembako Djuju' >
-        <DashboardLayout children={page} pageName="Laporan Rentang Tanggal" />
+    <AdminLayout title='Laporan Rentang Waktu - Admin Toko Sembako Djuju' keyword='laporan rentang waktu catatan penjualan barang dagangan toko sembako djuju' desc='Halaman untuk megelola laporan rentang waktu dagangan yang ada pada Toko Sembako Djuju' >
+        <DashboardLayout children={page} pageName="Laporan Penjualan Rentang Waktu" />
     </AdminLayout>
 )

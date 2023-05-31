@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Asset;
 use Carbon\Carbon;
 use App\Models\Note;
 use Inertia\Inertia;
@@ -13,8 +14,9 @@ class OmzetController extends Controller {
     
     public function index(){
 
-        $omzet = Omzet::all();
+        $asset = Asset::all();
         $products = Product::all();
+        $omzet = Omzet::orderBy('omzet_time', 'asc')->get();
 
         $now = Carbon::now();
         $lastMonth = $now->subMonth(1);
@@ -26,14 +28,16 @@ class OmzetController extends Controller {
 
         return Inertia::render('Admin/Omzet/Omzet', [
             'omzet' => $omzet,
+            'modal' => $asset,
             'products' => $products,
             'totalCostSubtotal_lastMonth' => $totalCostSubtotal_lastMonth,
         ]);
     }
 
     public function predict(){
-        $omzet = Omzet::all();
-        $latest = Omzet::latest()->first();
+
+        $omzet = Omzet::whereBetween('omzet_time', ['2022-01', '2022-12'])->get();
+        $latest = Omzet::where('omzet_time', 'LIKE', '2022-12%')->get();
 
         return Inertia::render('Admin/Omzet/PredictOmzet', [
             'omzet' => $omzet,
