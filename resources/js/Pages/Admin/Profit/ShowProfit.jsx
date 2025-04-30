@@ -115,7 +115,7 @@ export default function ShowProfit({profit}) {
 }
 
 ShowProfit.layout = page => (
-    <AdminLayout title='Ubah Profit - Admin Toko Sembako Djuju' keyword='ubah profit dagangan toko sembako djuju' desc='Halaman untuk mengelola profit dagangan yang ada pada Toko Sembako Djuju' >
+    <AdminLayout title='Ubah Profit - Admin JujuMart' keyword='ubah profit dagangan JujuMart' desc='Halaman untuk mengelola profit dagangan yang ada pada JujuMart' >
         <DashboardLayout children={page} pageName="Ubah Omzet" />
     </AdminLayout>
 )

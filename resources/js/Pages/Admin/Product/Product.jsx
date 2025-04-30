@@ -248,7 +248,7 @@ export default function Product({products}) {
 }
 
 Product.layout = page => (
-    <AdminLayout title='Barang - Admin Toko Sembako Djuju' keyword='barang dagangan toko sembako djuju' desc='Halaman untuk megelola barang atau produk dagangan yang ada pada Toko Sembako Djuju' >
+    <AdminLayout title='Barang - Admin JujuMart' keyword='barang dagangan JujuMart' desc='Halaman untuk megelola barang atau produk dagangan yang ada pada JujuMart' >
         <DashboardLayout children={page} pageName="Barang" />
     </AdminLayout>
 )

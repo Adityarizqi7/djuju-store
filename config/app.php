@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Toko Sembako Djuju'),
+    'name' => env('APP_NAME', 'JujuMart'),
 
     /*
     |--------------------------------------------------------------------------

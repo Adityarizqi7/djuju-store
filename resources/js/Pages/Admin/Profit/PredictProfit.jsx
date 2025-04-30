@@ -685,7 +685,7 @@ export default function PredictProfit({omzet, modal, latest}) {
 }
 
 PredictProfit.layout = page => (
-    <AdminLayout title='Prediksi Profit - Admin Toko Sembako Djuju' keyword='prediksi profit dagangan toko sembako djuju' desc='Halaman untuk memprediksi profit dagangan yang ada pada Toko Sembako Djuju' >
+    <AdminLayout title='Prediksi Profit - Admin JujuMart' keyword='prediksi profit dagangan JujuMart' desc='Halaman untuk memprediksi profit dagangan yang ada pada JujuMart' >
         <DashboardLayout children={page} pageName="Prediksi Profit" />
     </AdminLayout>
 )

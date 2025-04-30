@@ -214,7 +214,7 @@ export default function User({users}) {
 }
 
 User.layout = page => (
-    <AdminLayout title='Pengguna - Admin Toko Sembako Djuju' keyword='pengguna aplikasi pada toko sembako djuju' desc='Halaman untuk megelola pengguna aplikasi (Pegawai atau Admin) yang ada pada Toko Sembako Djuju' >
+    <AdminLayout title='Pengguna - Admin JujuMart' keyword='pengguna aplikasi pada JujuMart' desc='Halaman untuk megelola pengguna aplikasi (Pegawai atau Admin) yang ada pada JujuMart' >
         <DashboardLayout children={page} pageName="Pengguna" />
     </AdminLayout>
 )

@@ -16,8 +16,8 @@ import { EyeSlashIcon } from "@heroicons/react/24/outline";
 export default function Login() {
     
     const { data, setData, post, processing, errors, reset } = useForm({
-        email: '',
-        password: '',
+        email: 'djujustore@gmail.com',
+        password: 'djujustore02_',
         remember: false,
     });
 
@@ -75,7 +75,11 @@ export default function Login() {
 
             {/* {status && <div className="mb-4 font-medium text-sm text-green-600">{status}</div>} */}
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} className='pb-5'>
+                <div className="greeting montserrat text-center pt-4 pb-9">
+                    <h3 className='font-semibold text-[1.75rem]'>Masuk ke JujuMart</h3>
+                    <h3 className='text-[1.10rem] mt-1'>Yuk, lanjutkan kelola inventorynya.</h3>
+                </div>
                 <div className='form-control'>
                     <InputLabel htmlFor="email" value="Email" className='text-sm' />
                     <TextInput

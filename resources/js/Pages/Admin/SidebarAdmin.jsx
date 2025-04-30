@@ -65,7 +65,7 @@ export default function SidebarAdmin({auth}) {
             <div className="first-left md:flex hidden items-center">
                 <div className="logo-wrapper">
                     <div className="text-logo montserrat">
-                        <h1 className='font-semibold text-[1.5rem] text-orange-400'>DJUJU</h1>
+                        <h1 className='font-semibold text-[1.5rem] text-orange-400'>JujuMart</h1>
                         <h2>Toko Sembako</h2>
                     </div>
                 </div>

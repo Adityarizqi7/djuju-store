@@ -30,7 +30,7 @@ export default function DashboardLayout({pageName = 'Dashboard', children}) {
                 <article className="content-wrapper md:flex-row flex-col">
                         <nav className="md:hidden bg-blue-base/95 text-neutral-100 flex flex-wrap navout-up-dash text-center font-semibold items-center justify-center px-2 py-3 w-full montserrat">
                             <div className="text-center montserrat">
-                                <h1 className='font-semibold text-[1.5rem] text-orange-400'>DJUJU</h1>
+                                <h1 className='font-semibold text-[1.5rem] text-orange-400'>JujuMart</h1>
                                 <h2>Toko Sembako</h2>
                             </div>
                         </nav>
@@ -156,7 +156,7 @@ export default function DashboardLayout({pageName = 'Dashboard', children}) {
                             </div>
                             <footer className='mt-auto py-3 px-2 text-center border-t border-gray-200'>
                                 <div className="box-copright-sosmed text-neutral-800 montserrat">
-                                    <h1>© {CurrentYear()} - Toko Sembako Djuju. All Rights Reserved.</h1>
+                                    <h1>© {CurrentYear()} - JujuMart. All Rights Reserved.</h1>
                                 </div>
                             </footer>
                         </div>
@@ -166,4 +166,4 @@ export default function DashboardLayout({pageName = 'Dashboard', children}) {
     )
 }
 
-DashboardLayout.layout = (page, title, keyword, desc) => <AdminLayout children={page} title={title || 'Dashboard - Admin Toko Sembako Djuju'} keyword={keyword || 'dashboard djuju, dashboard toko sembako djuju'} desc={desc || 'Dashboard untuk mengelola toko sembako djuju'} />
+DashboardLayout.layout = (page, title, keyword, desc) => <AdminLayout children={page} title={title || 'Dashboard - JujuMart'} keyword={keyword || 'dashboard jujumart, dashboard jujumart'} desc={desc || 'Dashboard untuk mengelola toko sembako JujuMart'} />

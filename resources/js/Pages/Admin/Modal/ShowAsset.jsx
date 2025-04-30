@@ -313,7 +313,7 @@ export default function ShowAsset({products, modal}) {
 }
 
 ShowAsset.layout = page => (
-    <AdminLayout title='Ubah Modal - Admin Toko Sembako Djuju' keyword='ubah modal dagangan toko sembako djuju' desc='Halaman untuk mengelola modal dagangan yang ada pada Toko Sembako Djuju' >
+    <AdminLayout title='Ubah Modal - JujuMart' keyword='ubah modal dagangan jujumart' desc='Halaman untuk mengelola modal dagangan yang ada pada JujuMart' >
         <DashboardLayout children={page} pageName="Ubah Modal" />
     </AdminLayout>
 )

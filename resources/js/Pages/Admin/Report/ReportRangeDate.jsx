@@ -79,7 +79,7 @@ export default function ReportRangeDate({notes}) {
         doc.setFontSize(18)
         var pageSize = doc.internal.pageSize
         var pageWidth = pageSize.width ? pageSize.width : pageSize.getWidth()
-        var text = doc.splitTextToSize(`Laporan Catatan Penjualan Pada Toko Sembako Djuju - ${state.map(e => rangeDateReadble(rangeDateSplit(e?.startDate)) + ' / ' + rangeDateReadble(rangeDateSplit(e?.endDate)))}`, pageWidth - 30, {})
+        var text = doc.splitTextToSize(`Laporan Catatan Penjualan Pada JujuMart - ${state.map(e => rangeDateReadble(rangeDateSplit(e?.startDate)) + ' / ' + rangeDateReadble(rangeDateSplit(e?.endDate)))}`, pageWidth - 30, {})
         var textTwo = doc.splitTextToSize(`Total Omzet: ${costTotal}`, pageWidth - 30, {})
         doc.setLineHeightFactor(1.5)
         doc.text(text, 14, 18)
@@ -197,7 +197,7 @@ export default function ReportRangeDate({notes}) {
                                             id="convert-xls-button"
                                             className="download-table-xls-button w-full text-start"
                                             table="table-data"
-                                            filename={`Laporan Catatan Penjualan Pada Toko Sembako Djuju - ${
+                                            filename={`Laporan Catatan Penjualan Pada JujuMart - ${
                                                 state.map(e => rangeDateReadble(rangeDateSplit(e?.startDate)) + ' / ' + rangeDateReadble(rangeDateSplit(e?.endDate)))
                                             }`}
                                             filetype="xls"
@@ -470,7 +470,7 @@ export default function ReportRangeDate({notes}) {
 }
 
 ReportRangeDate.layout = page => (
-    <AdminLayout title='Laporan Rentang Waktu - Admin Toko Sembako Djuju' keyword='laporan rentang waktu catatan penjualan barang dagangan toko sembako djuju' desc='Halaman untuk megelola laporan rentang waktu dagangan yang ada pada Toko Sembako Djuju' >
+    <AdminLayout title='Laporan Rentang Waktu - Admin JujuMart' keyword='laporan rentang waktu catatan penjualan barang dagangan JujuMart' desc='Halaman untuk megelola laporan rentang waktu dagangan yang ada pada JujuMart' >
         <DashboardLayout children={page} pageName="Laporan Penjualan Rentang Waktu" />
     </AdminLayout>
 )

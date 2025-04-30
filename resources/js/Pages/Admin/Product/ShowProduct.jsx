@@ -173,7 +173,7 @@ export default function ShowProduct({product}) {
 }
 
 ShowProduct.layout = page => (
-    <AdminLayout title='Ubah Barang - Admin Toko Sembako Djuju' keyword='lihat dan edit barang dagangan toko sembako djuju' desc='Halaman untuk mengelola barang atau produk dagangan yang ada pada Toko Sembako Djuju' >
+    <AdminLayout title='Ubah Barang - Admin JujuMart' keyword='lihat dan edit barang dagangan JujuMart' desc='Halaman untuk mengelola barang atau produk dagangan yang ada pada JujuMart' >
         <DashboardLayout children={page} pageName="Ubah Barang" />
     </AdminLayout>
 )

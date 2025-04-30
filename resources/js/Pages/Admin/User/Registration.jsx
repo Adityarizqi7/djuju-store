@@ -230,7 +230,7 @@ export default function Registration({latestRecord}) {
 }
 
 Registration.layout = page => (
-    <AdminLayout title='Tambah Pengguna - Admin Toko Sembako Djuju' keyword='tambah pengguna dagangan toko sembako djuju' desc='Halaman untuk megelola pengguna yang ada pada Toko Sembako Djuju' >
+    <AdminLayout title='Tambah Pengguna - Admin JujuMart' keyword='tambah pengguna dagangan JujuMart' desc='Halaman untuk megelola pengguna yang ada pada JujuMart' >
         <DashboardLayout children={page} pageName="Tambah Pengguna" />
     </AdminLayout>
 )

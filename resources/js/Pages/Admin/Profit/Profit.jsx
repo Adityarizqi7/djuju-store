@@ -329,7 +329,7 @@ export default function Profit({modal, omzet, totalProfit_lastMonth}) {
 }
 
 Profit.layout = page => (
-    <AdminLayout title='Profit - Admin Toko Sembako Djuju' keyword='profit dagangan toko sembako djuju' desc='Halaman untuk mengelola profit dagangan yang ada pada Toko Sembako Djuju' >
+    <AdminLayout title='Profit - Admin JujuMart' keyword='profit dagangan JujuMart' desc='Halaman untuk mengelola profit dagangan yang ada pada JujuMart' >
         <DashboardLayout children={page} pageName="Profit" />
     </AdminLayout>
 )

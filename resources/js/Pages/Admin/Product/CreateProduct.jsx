@@ -184,7 +184,7 @@ export default function CreateProduct({latestRecord}) {
 }
 
 CreateProduct.layout = page => (
-    <AdminLayout title='Tambah Barang - Admin Toko Sembako Djuju' keyword='tambah barang dagangan toko sembako djuju' desc='Halaman untuk megelola barang atau produk dagangan yang ada pada Toko Sembako Djuju' >
+    <AdminLayout title='Tambah Barang - Admin JujuMart' keyword='tambah barang dagangan JujuMart' desc='Halaman untuk megelola barang atau produk dagangan yang ada pada JujuMart' >
         <DashboardLayout children={page} pageName="Tambah Barang" />
     </AdminLayout>
 )

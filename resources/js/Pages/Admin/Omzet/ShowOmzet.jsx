@@ -116,7 +116,7 @@ export default function ShowOmzet({omzet}) {
 }
 
 ShowOmzet.layout = page => (
-    <AdminLayout title='Ubah Omzet - Admin Toko Sembako Djuju' keyword='ubah omzet dagangan toko sembako djuju' desc='Halaman untuk mengelola omzet dagangan yang ada pada Toko Sembako Djuju' >
+    <AdminLayout title='Ubah Omzet - Admin JujuMart' keyword='ubah omzet dagangan jujumart' desc='Halaman untuk mengelola omzet dagangan yang ada pada JujuMart' >
         <DashboardLayout children={page} pageName="Ubah Omzet" />
     </AdminLayout>
 )

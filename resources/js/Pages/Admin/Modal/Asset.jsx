@@ -465,7 +465,7 @@ export default function Modal({products, modal}) {
 }
 
 Modal.layout = page => (
-    <AdminLayout title='Modal - Admin Toko Sembako Djuju' keyword='modal dagangan toko sembako djuju' desc='Halaman untuk mengelola modal dagangan yang ada pada Toko Sembako Djuju' >
+    <AdminLayout title='Modal - Admin JujuMart' keyword='modal dagangan JujuMart' desc='Halaman untuk mengelola modal dagangan yang ada pada JujuMart' >
         <DashboardLayout children={page} pageName="Modal" />
     </AdminLayout>
 )

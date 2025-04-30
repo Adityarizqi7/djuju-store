@@ -674,7 +674,7 @@ export default function Note({products, notes}) {
 }
 
 Note.layout = page => (
-    <AdminLayout title='Catatan Penjualan - Admin Toko Sembako Djuju' keyword='catatan penjualan barang dagangan toko sembako djuju' desc='Halaman untuk megelola catatan penjualan dan transaksi dagangan yang ada pada Toko Sembako Djuju' >
+    <AdminLayout title='Catatan Penjualan - Admin JujuMart' keyword='catatan penjualan barang dagangan JujuMart' desc='Halaman untuk megelola catatan penjualan dan transaksi dagangan yang ada pada JujuMart' >
         <DashboardLayout children={page} pageName="Catatan Penjualan" />
     </AdminLayout>
 )

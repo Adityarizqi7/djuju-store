@@ -72,7 +72,7 @@ export default function ReportYear({notes}) {
         doc.setFontSize(18)
         var pageSize = doc.internal.pageSize
         var pageWidth = pageSize.width ? pageSize.width : pageSize.getWidth()
-        var text = doc.splitTextToSize(`Laporan Catatan Penjualan Pada Toko Sembako Djuju - Tahun ${date }`, pageWidth - 30, {})
+        var text = doc.splitTextToSize(`Laporan Catatan Penjualan Pada JujuMart - Tahun ${date }`, pageWidth - 30, {})
         var textTwo = doc.splitTextToSize(`Total Omzet: ${costTotal}`, pageWidth - 30, {})
         doc.setLineHeightFactor(1.5)
         doc.text(text, 14, 18)
@@ -335,7 +335,7 @@ export default function ReportYear({notes}) {
                                     id="convert-xls-button"
                                     className="download-table-xls-button"
                                     table="table-data"
-                                    filename={`Laporan Penjualan Pada Toko Sembako Djuju - Tahun ${date }`}
+                                    filename={`Laporan Penjualan Pada JujuMart - Tahun ${date }`}
                                     filetype="xls"
                                     sheet="tablexls"
                                     buttonText="Excel"
@@ -466,7 +466,7 @@ export default function ReportYear({notes}) {
 }
 
 ReportYear.layout = page => (
-    <AdminLayout title='Laporan Tahunan - Admin Toko Sembako Djuju' keyword='laporan tahunan catatan penjualan barang dagangan toko sembako djuju' desc='Halaman untuk megelola laporan mingguan dagangan yang ada pada Toko Sembako Djuju' >
+    <AdminLayout title='Laporan Tahunan - Admin JujuMart' keyword='laporan tahunan catatan penjualan barang dagangan JujuMart' desc='Halaman untuk megelola laporan mingguan dagangan yang ada pada JujuMart' >
         <DashboardLayout children={page} pageName="Laporan Penjualan Tahunan" />
     </AdminLayout>
 )

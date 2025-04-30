@@ -102,7 +102,7 @@ export default function ReportDay({notes}) {
         doc.setFontSize(18)
         var pageSize = doc.internal.pageSize
         var pageWidth = pageSize.width ? pageSize.width : pageSize.getWidth()
-        var text = doc.splitTextToSize(`Laporan Catatan Penjualan Pada Toko Sembako Djuju - ${convertDateReadble(date)}`, pageWidth - 30, {})
+        var text = doc.splitTextToSize(`Laporan Catatan Penjualan Pada JujuMart - ${convertDateReadble(date)}`, pageWidth - 30, {})
         var textTwo = doc.splitTextToSize(`Total Omzet: ${costTotal}`, pageWidth - 30, {})
         doc.setLineHeightFactor(1.5)
         doc.text(text, 14, 18)
@@ -376,7 +376,7 @@ export default function ReportDay({notes}) {
                                     id="convert-xls-button"
                                     className="download-table-xls-button"
                                     table="table-data"
-                                    filename={`Laporan Penjualan Pada Toko Sembako Djuju - ${convertDateReadble(date)}`}
+                                    filename={`Laporan Penjualan Pada JujuMart - ${convertDateReadble(date)}`}
                                     filetype="xls"
                                     sheet="tablexls"
                                     buttonText="Excel"
@@ -508,7 +508,7 @@ export default function ReportDay({notes}) {
 }
 
 ReportDay.layout = page => (
-    <AdminLayout title='Laporan Harian - Admin Toko Sembako Djuju' keyword='laporan harian catatan penjualan barang dagangan toko sembako djuju' desc='Halaman untuk megelola laporan harian dagangan yang ada pada Toko Sembako Djuju' >
+    <AdminLayout title='Laporan Harian - Admin JujuMart' keyword='laporan harian catatan penjualan barang dagangan JujuMart' desc='Halaman untuk megelola laporan harian dagangan yang ada pada JujuMart' >
         <DashboardLayout children={page} pageName="Laporan Penjualan Harian" />
     </AdminLayout>
 )

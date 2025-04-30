@@ -113,7 +113,7 @@ export default function Dashboard({notes, omzet, modal}) {
                                         className="space-x-0.5"
                                         alignItems="center"
                                     >
-                                        <Title className='font-semibold'> Riwayat Omzet Toko Sembako Djuju </Title>
+                                        <Title className='font-semibold'> Riwayat Omzet JujuMart </Title>
                                         <Icon
                                             icon={InformationCircleIcon}
                                             variant="simple"
@@ -230,7 +230,7 @@ export default function Dashboard({notes, omzet, modal}) {
 }
 
 Dashboard.layout = page => (
-    <AdminLayout title='Dashboard - Admin Toko Sembako Djuju' keyword='dashboard djuju, dashboard toko sembako djuju' desc='Dashboard untuk mengelola toko sembako djuju' >
+    <AdminLayout title='Dashboard - Admin JujuMart' keyword='dashboard JujuMart, dashboard toko sembako JujuMart' desc='Dashboard untuk mengelola JujuMart' >
         <DashboardLayout children={page} pageName="Dashboard" />
     </AdminLayout>
 )

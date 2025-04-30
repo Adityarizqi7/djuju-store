@@ -283,7 +283,7 @@ export default function Omzet({modal, omzet, totalCostSubtotal_lastMonth}) {
 }
 
 Omzet.layout = page => (
-    <AdminLayout title='Omzet - Admin Toko Sembako Djuju' keyword='omzet dagangan toko sembako djuju' desc='Halaman untuk mengelola omzet dagangan yang ada pada Toko Sembako Djuju' >
+    <AdminLayout title='Omzet - Admin JujuMart' keyword='omzet dagangan JujuMart' desc='Halaman untuk mengelola omzet dagangan yang ada pada JujuMart' >
         <DashboardLayout children={page} pageName="Omzet" />
     </AdminLayout>
 )

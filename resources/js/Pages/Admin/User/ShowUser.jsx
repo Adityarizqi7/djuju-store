@@ -163,7 +163,7 @@ export default function ShowUser({user}) {
 }
 
 ShowUser.layout = page => (
-    <AdminLayout title='Ubah Pengguna - Admin Toko Sembako Djuju' keyword='tambah pengguna dagangan toko sembako djuju' desc='Halaman untuk megelola pengguna yang ada pada Toko Sembako Djuju' >
+    <AdminLayout title='Ubah Pengguna - Admin JujuMart' keyword='tambah pengguna dagangan JujuMart' desc='Halaman untuk megelola pengguna yang ada pada JujuMart' >
         <DashboardLayout children={page} pageName="Ubah Pengguna" />
     </AdminLayout>
 )

@@ -609,7 +609,7 @@ export default function PredictOmzet({omzet, latest}) {
 }
 
 PredictOmzet.layout = page => (
-    <AdminLayout title='Prediksi Omzet - Admin Toko Sembako Djuju' keyword='prediksi omzet dagangan toko sembako djuju' desc='Halaman untuk memprediksi omzet dagangan yang ada pada Toko Sembako Djuju' >
+    <AdminLayout title='Prediksi Omzet - Admin JujuMart' keyword='prediksi omzet dagangan JujuMart' desc='Halaman untuk memprediksi omzet dagangan yang ada pada JujuMart' >
         <DashboardLayout children={page} pageName="Prediksi Omzet" />
     </AdminLayout>
 )
