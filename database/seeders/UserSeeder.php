@@ -16,7 +16,7 @@ class UserSeeder extends Seeder
     {
         $user = [
             [
-                'name' => 'Admin Toko Djuju',
+                'name' => 'Admin JujuMart',
                 'email' => 'djujustore@gmail.com',
                 'address' => 'Jln. Pogot Baru',
                 'phone' => '083244532765',
