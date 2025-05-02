@@ -11,7 +11,7 @@ export default defineConfig({
                 'resources/scss/base.scss',
                 'resources/scss/admin/_signin.scss',
                 'resources/scss/admin/_dashboard.scss',
-                'resources/scss/component/_btntotop.scss',
+                'resources/scss/admin/component/_btntotop',
                 'resources/scss/admin/product/_note.scss',
                 'resources/scss/admin/product/_report.scss',
                 'resources/scss/admin/product/_product.scss',
